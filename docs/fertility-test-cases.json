@@ -1,0 +1,301 @@
+{
+  "_note": "Fixtures derived for this app from the reconciled rules (docs/fertility-rules.md). Written for this project, not copied from sympto or drip. Where an Amendment in fertility-rules.md changes an outcome, the Amendment wins and the implementation must update the expected value and record why.",
+  "reconciled_cases": [
+    {
+      "name": "01 Normal cycle, 5-day rule, regular temperature rule",
+      "previous_cycles": "Hstd (previous cycle double-checked, FHM CD15; fewer than 12 cycles; earliest FHM >= CD13) -> N = 5",
+      "days": "Temps CD1-15 = P = 36.50,36.40,36.45,36.40,36.50,36.45,36.40,36.45,36.50,36.40,36.45,36.40,36.50,36.45,36.40; CD16 36.60, CD17 36.65, CD18 36.75, CD19-28 36.75. Mucus/bleeding = Mbase: CD1-4 bleeding H,H,M,L with mucus 'not assessable (bleeding)'; CD5 spotting dry/none (t); CD6-8 dry/none (t); CD9-10 nothing/none (Ø); CD11 moist/none (f); CD12-13 nothing/creamy (S); CD14-15 slippery/egg-white (S+); CD16 nothing/creamy (S); CD17 moist/none (f); CD18 nothing/none (Ø); CD19-28 dry/none (t). All observationComplete. Next period CD29.",
+      "expected": "CD1-4 period / infertile_pre_ovulatory. CD5 period (spotting, contiguous) / infertile_pre_ovulatory. CD6-17 fertile. Temperature: FHM CD16, CL 36.50, regular rule, complete CD18 (+0.25). Mucus: peak CD15, complete CD18. CD18 fertile with eveningTransition. CD19-28 infertile_post_ovulatory."
+    },
+    {
+      "name": "02 Third higher reading exactly +0.20 passes (inclusive threshold)",
+      "previous_cycles": "Hstd",
+      "days": "As test 01, but CD18 = 36.70 (36.70 - 36.50 = 0.20).",
+      "expected": "Regular rule, complete CD18. CD18 fertile with eveningTransition; CD19+ infertile_post_ovulatory."
+    },
+    {
+      "name": "03 Third higher reading +0.19 fails the regular rule; Exception 1 completes on the 4th (raw, no rounding)",
+      "previous_cycles": "Hstd",
+      "days": "As test 01, but CD18 = 36.69, CD19 = 36.75.",
+      "expected": "Regular fails (0.19 < 0.20). Exception 1: CD19 is 0.25 above CL, so completes CD19. CD6-18 fertile; CD19 fertile with eveningTransition; CD20+ infertile_post_ovulatory. (sympto would round 36.69 to 36.70 and confirm on CD18. The app is one day later by design.)"
+    },
+    {
+      "name": "04 First cycle ever: no pre-ovulatory phase and one extra higher reading",
+      "previous_cycles": "none (first cycle in the app)",
+      "days": "Identical to test 01 (P + T1hi, Mbase).",
+      "expected": "N = 0, so CD1-5 period / fertile. Regular rule completes CD18; the first-cycle extra reading CD19 36.75 is >= CL + 0.05, so temperature completes CD19. Mucus complete CD18. CD6-18 fertile; CD19 fertile with eveningTransition; CD20-28 infertile_post_ovulatory."
+    },
+    {
+      "name": "05 First cycle with Exception 1 needs a 5th higher reading",
+      "previous_cycles": "none",
+      "days": "Temps CD1-15 = P; CD16 36.60, CD17 36.65, CD18 36.65, CD19 36.60, CD20-28 36.75. Mucus = Mbase.",
+      "expected": "Exception 1 completes CD19; the first-cycle extra reading CD20 is above CL, so temperature completes CD20. CD1-5 period / fertile; CD6-19 fertile; CD20 fertile with eveningTransition; CD21+ infertile_post_ovulatory."
+    },
+    {
+      "name": "06 Exception 1 (third higher reading < +0.2, 4th above coverline)",
+      "previous_cycles": "Hstd",
+      "days": "Temps CD1-15 = P; CD16 36.60, CD17 36.65, CD18 36.65 (+0.15), CD19 36.60 (+0.10), CD20-28 36.75. Mucus = Mbase.",
+      "expected": "FHM CD16, CL 36.50, Exception 1 completes CD19. Mucus complete CD18. CD1-5 as test 01; CD6-18 fertile; CD19 fertile with eveningTransition; CD20+ infertile_post_ovulatory."
+    },
+    {
+      "name": "07 Exception 1 fails: 4th reading on the coverline; no later shift",
+      "previous_cycles": "Hstd",
+      "days": "Temps CD1-15 = P; CD16 36.60, CD17 36.65, CD18 36.65, CD19 36.50, CD20 36.55, CD21 36.55 (data ends CD21, today = CD21). Mucus = Mbase.",
+      "expected": "CD16 candidate fails (CD19 = CL). CD17 candidate (CL 36.60 from CD11-16; 36.65 is +0.05): CD18 above, CD19 is a dip, so Exception 2 needs CD20 >= 36.80; 36.55 fails. CD18-21 are not candidates. No shift, so CD6-21 fertile; no post-ovulatory phase."
+    },
+    {
+      "name": "08 Exception 2 (one dip below the coverline, 4th >= +0.2)",
+      "previous_cycles": "Hstd",
+      "days": "Temps CD1-15 = P; CD16 36.60, CD17 36.45 (dip), CD18 36.65, CD19 36.75, CD20-28 36.75. Mucus = Mbase.",
+      "expected": "Exception 2: CD17 is the single dip, CD18 is above, CD19 is +0.25, so completes CD19. CD6-18 fertile; CD19 fertile with eveningTransition; CD20+ infertile_post_ovulatory."
+    },
+    {
+      "name": "09 Exceptions cannot be combined; a later FHM confirms",
+      "previous_cycles": "Hstd",
+      "days": "Temps CD1-15 = P; CD16 36.60, CD17 36.45, CD18 36.65, CD19 36.65, CD20 36.70, CD21 36.80, CD22-28 36.80. Mucus = Mbase.",
+      "expected": "CD16 candidate: one dip (CD17), but CD19 is only +0.15, so it would need both exceptions; it fails. CD18 candidate: CL = max(CD12-17) = 36.60; CD19 +0.05, CD20 +0.10 (< 0.2), CD21 +0.20 above, so Exception 1 completes CD21 (FHM CD18). CD6-20 fertile; CD21 fertile with eveningTransition; CD22+ infertile_post_ovulatory."
+    },
+    {
+      "name": "10 Reading 0.03 above the coverline counts as a dip (app is stricter than sympto)",
+      "previous_cycles": "Hstd",
+      "days": "Temps CD1-15 = P; CD16 36.60, CD17 36.53, CD18 36.72, CD19 36.70, CD20-28 36.75. Mucus = Mbase.",
+      "expected": "CD17 is +0.03 (< 0.05), so it is a dip. CD18 is +0.22 above. Exception 2 needs CD19 >= +0.20; 36.70 = +0.20, so completes CD19. CD18 fertile; CD19 fertile with eveningTransition; CD20+ infertile_post_ovulatory. (sympto: 36.53 rounds to 36.55, which is above, and 36.72 rounds to 36.70, so the regular rule completes on CD18.)"
+    },
+    {
+      "name": "11 Fever reading among the lows, bracketed vs not bracketed",
+      "previous_cycles": "Hstd",
+      "days": "Variant A: temps = P but CD13 = 37.10 marked EXCLUDED (reason fever); then T1hi (CD16 36.60, CD17 36.65, CD18 36.75, CD19-28 36.75). Mucus = Mbase. Variant B: same, but CD13 37.10 is only logged with an illness flag, not bracketed (SUSPECT).",
+      "expected": "A: the lows for CD16 skip CD13 (1 gap <= 2): CD15,14,12,11,10,9, so CL 36.50. Regular rule completes CD18; CD18 fertile with eveningTransition; CD19+ infertile_post_ovulatory. B: SUSPECT is used as a low, so CL = 37.10 for CD16-19. At CD20 the lows are CD14-19, CL 36.75, and no later reading is >= 36.80. No shift: CD6-28 fertile."
+    },
+    {
+      "name": "12 Bracketed (alcohol) reading inside the higher readings counts as a dip",
+      "previous_cycles": "Hstd",
+      "days": "Temps = P; CD16 36.60, CD17 36.90 EXCLUDED (reason alcohol), CD18 36.75, CD19-28 36.75. Mucus = Mbase.",
+      "expected": "CD17 is treated as the single dip. Exception 2: CD18 above, CD19 +0.25, so completes CD19. CD18 fertile; CD19 fertile with eveningTransition; CD20+ infertile_post_ovulatory."
+    },
+    {
+      "name": "13 Off-time measurement cannot serve as a higher reading",
+      "previous_cycles": "Hstd; usual measurement time 06:30",
+      "days": "Temps = P + T1hi, but CD18 36.75 was measured at 08:00 (90 min late), so SUSPECT. Mucus = Mbase.",
+      "expected": "CD18 is a dip, so the regular rule and Exception 1 fail. Exception 2 (CD17 above, CD19 36.75 = +0.25) completes CD19. CD18 fertile; CD19 fertile with eveningTransition; CD20+ infertile_post_ovulatory."
+    },
+    {
+      "name": "14 Too many missing readings among the lows: no evaluation",
+      "previous_cycles": "Hstd",
+      "days": "Temps = P but CD11, CD12, CD13 MISSING; CD16 36.60, CD17 36.65, CD18 36.75, CD19-28 36.75. Mucus = Mbase.",
+      "expected": "Candidates CD14-19 each pass over 3 gap days (more than 2), so they are skipped. CD20+: lows CD14-19 give CL 36.75, and no later reading is >= 36.80. No shift: CD6-28 fertile, with the warning 'too many missing temperatures'. (sympto ignores gaps and would confirm on CD18.)"
+    },
+    {
+      "name": "15 Missing mucus entry after the peak moves the effective peak",
+      "previous_cycles": "Hstd",
+      "days": "Temps = P + T1hi (temperature completes CD18). Mucus = Mbase but CD17 has no mucus entry; CD18 Ø, CD19 t, CD20 t.",
+      "expected": "Effective peak = CD17 (unknown after fertile mucus); CD18-20 known and < S+, so mucus completes CD20. S = CD20. CD6-19 fertile; CD20 fertile with eveningTransition; CD21+ infertile_post_ovulatory. (sympto skips the gap: CD19.)"
+    },
+    {
+      "name": "16 Mucus/temperature disagreement: temperature first, mucus later",
+      "previous_cycles": "Hstd",
+      "days": "Temps = P + T1hi (complete CD18). Mucus: CD1-10 as Mbase; CD11 f; CD12-13 S; CD14-20 slippery/egg-white (S+); CD21 S; CD22 f; CD23 Ø; CD24-28 t.",
+      "expected": "Peak CD20, mucus complete CD23. S = CD23. CD6-22 fertile; CD23 fertile with eveningTransition; CD24-28 infertile_post_ovulatory."
+    },
+    {
+      "name": "17 Mucus complete but no temperature shift; next cycle loses the 5-day rule",
+      "previous_cycles": "Hstd",
+      "days": "Temps CD1-15 = P; CD16-30 alternating 36.45, 36.50 (CD16 36.45). Mucus = Mbase (complete CD18). Next period CD31. Next cycle: CD1-4 bleeding not assessable, CD5 spotting dry, CD6+ t.",
+      "expected": "No reading ever >= CL + 0.05, so no shift; this cycle CD6-30 fertile. Next cycle: the previous cycle had no double check, so N = 0; next-cycle CD1-5 period / fertile; CD6+ fertile until its own double check."
+    },
+    {
+      "name": "18 Best mucus is only f (moist): no peak, no post-ovulatory phase",
+      "previous_cycles": "Hstd",
+      "days": "Temps = P + T1hi (temperature confirmed CD18). Mucus: CD1-10 as Mbase; CD11-15 moist/none (f); CD16-28 dry/none (t).",
+      "expected": "M = 2 < 3, so no mucus peak. CD6-28 fertile. Next cycle: no pre-ovulatory phase. (sympto would take CD15 f as the peak and confirm on CD18.)"
+    },
+    {
+      "name": "19 Fertile mucus ends the 5-day rule early",
+      "previous_cycles": "Hstd (N = 5)",
+      "days": "CD1-3 bleeding H,H,M with mucus not assessable, complete; CD4 bleeding light with sensation moist (f); CD5 dry/none (t), no bleeding; later days arbitrary.",
+      "expected": "CD1-3 period / infertile_pre_ovulatory. CD4 period / fertile (Q = 2 ends the phase). CD5 fertile (phase closed, although dry)."
+    },
+    {
+      "name": "20 5-day rule with a missing day and with a provisional entry",
+      "previous_cycles": "Hstd (N = 5)",
+      "days": "Variant A: CD1-3 bleeding not assessable, complete; CD4 no entry at all; CD5 dry/none, complete. Variant B: CD1 bleeding not assessable, complete; CD2 bleeding entry made at 07:00, never confirmed (observationComplete = false); CD3-5 bleeding not assessable, complete.",
+      "expected": "A: CD1-3 period / infertile_pre_ovulatory; CD4 fertile (missing entry); CD5 fertile (phase closed). B: CD1 period / infertile_pre_ovulatory; CD2 period / fertile; CD3-5 period / fertile. While today = CD2 before evening confirmation, CD2 shows fertile with reason awaiting_evening_observation."
+    },
+    {
+      "name": "21 Minus-8 rule shortens the phase (early FHM in one earlier cycle)",
+      "previous_cycles": "Previous cycle double-checked, FHM CD15; one earlier cycle double-checked with FHM CD12; 2 cycles total",
+      "days": "CD1-5 bleeding H,H,M,L,L, mucus not assessable, complete; CD6 dry/none.",
+      "expected": "earliest FHM 12, so cand = 4 < 5 and N = 4. CD1-4 period / infertile_pre_ovulatory; CD5 period / fertile; CD6 fertile."
+    },
+    {
+      "name": "22 Minus-8 lengthens only with 12 double-checked cycles",
+      "previous_cycles": "Variant A: 12 cycles (including the previous one), all STRICT double-checked, every FHM on CD15. Variant B: the same with only 11 cycles.",
+      "days": "CD1-4 bleeding not assessable; CD5 spotting dry/none; CD6 dry/none; CD7 nothing/none; CD8 dry/none; CD9 onward as Mbase. All complete.",
+      "expected": "A: cand = 15 - 8 = 7, N = 7. CD1-5 period / infertile_pre_ovulatory; CD6-7 infertile_pre_ovulatory; CD8 fertile. B: N = 5; CD1-5 period / infertile_pre_ovulatory; CD6-8 fertile."
+    },
+    {
+      "name": "23 A temperature-only early FHM in history blocks lengthening",
+      "previous_cycles": "12 STRICT double-checked cycles (FHM CD15 each, the most recent one is the previous cycle) plus one older cycle with a confirmed temperature shift (FHM CD13) but no mucus logged (no double check)",
+      "days": "Same current-cycle data as test 22.",
+      "expected": "earliest FHM over all history = 13, so cand = 5 and N = 5 (12 double-checked cycles, cand not < 5). CD1-5 period / infertile_pre_ovulatory; CD6-8 fertile. (sympto ignores the cycle without a double check: N = 7.)"
+    },
+    {
+      "name": "24 Bleeding on day 6 inside a 7-day minus-8 window",
+      "previous_cycles": "12 double-checked cycles, FHM CD15 each (N = 7)",
+      "days": "CD1-6 bleeding H,H,M,L,L,L with mucus not assessable, complete; CD7 dry/none.",
+      "expected": "CD1-5 period / infertile_pre_ovulatory; CD6 period / fertile (bleeding after day 5 masks mucus); CD7 fertile (phase closed)."
+    },
+    {
+      "name": "25 Previous cycle without a double check disables the pre-ovulatory phase despite 12 good earlier cycles",
+      "previous_cycles": "Previous cycle: temperature shift but best mucus only f (no double check). Before it: 12 double-checked cycles, FHM CD15.",
+      "days": "P + T1hi; Mbase.",
+      "expected": "N = 0, so CD1-5 period / fertile. Not a first cycle (previous cycle tracked), so the standard temperature rule applies: CD18 fertile with eveningTransition; CD19+ infertile_post_ovulatory; CD6-17 fertile."
+    },
+    {
+      "name": "26 Fertile mucus returns after post-ovulatory confirmation (app safeguard)",
+      "previous_cycles": "Hstd",
+      "days": "As test 01 (S = CD18, CL 36.50, M_S = 4), but CD22 slippery/egg-white (S+), CD23 nothing/creamy (S), CD24-28 dry/none. Temps CD19-28 36.75.",
+      "expected": "CD18 fertile with eveningTransition; CD19-21 infertile_post_ovulatory; CD22 fertile (reason fertile_mucus_after_confirmation); CD23-24 fertile; CD25 = new peak + 3, and temps CD22-25 are all >= 36.55, so CD25 fertile with eveningTransition; CD26-28 infertile_post_ovulatory. (sympto ignores the later S+: CD19-28 infertile.)"
+    },
+    {
+      "name": "27 Hormonal contraception, then the first natural cycle",
+      "previous_cycles": "Pill taken 2026-03-01 to 2026-03-28 (hormonal_contraception context).",
+      "days": "2026-03-01 to 2026-03-28: pill days, any data. First bleed after stopping starts cycle 1: CD1 = 2026-03-31; cycle 1 data = P + T1hi temps, Mbase mucus.",
+      "expected": "2026-03-01 to 2026-03-28 not_applicable. Cycle 1 is a first cycle: N = 0, so CD1-5 (2026-03-31 to 04-04) period / fertile. Temperature completes CD19 (first-cycle extra reading); CD19 = 2026-04-18 fertile with eveningTransition; from 2026-04-19 infertile_post_ovulatory."
+    },
+    {
+      "name": "28 Fahrenheit thresholds (0.36 F rise, 0.09 F 'above')",
+      "previous_cycles": "Hstd",
+      "days": "Unit F all cycle. CD1-15 = 97.52, 97.40, 97.45, 97.40, 97.52, 97.45, 97.40, 97.45, 97.52, 97.40, 97.45, 97.40, 97.52, 97.45, 97.40 (CL for CD16 = 97.52). CD16 97.70, CD17 97.75, CD18 97.88, CD19-28 97.80. Variant: CD18 97.87. Mucus = Mbase.",
+      "expected": "Main: CD18 is +0.36 F, so regular, complete CD18; CD18 fertile with eveningTransition; CD19+ infertile_post_ovulatory. Variant: +0.35 F fails the regular rule; Exception 1 (CD19 +0.28 above) completes CD19; CD19 fertile with eveningTransition; CD20+ infertile."
+    },
+    {
+      "name": "29 Route change within the cycle blocks the temperature evaluation",
+      "previous_cycles": "Hstd",
+      "days": "As test 01, but CD17 measured vaginally (all other days oral).",
+      "expected": "Temperature evaluation NONE (blocked: route changed). CD1-5 period / infertile_pre_ovulatory (temperature not used); CD6-28 fertile. Next cycle: N = 0 (previous cycle had no double check)."
+    }
+  ],
+  "redteam_cases": [
+    {
+      "name": "30 Unconfirmed period after S does not extend post-ovulatory infertility",
+      "days": "Hstd. Test 01 data (P + T1hi, Mbase; S = CD18, FHM CD16, CL 36.50). Variant A: CD29-33 bleeding logged only as spotting, 'period started' never confirmed; temps CD29-31 36.40; no data CD34-50; today = CD50. Variant B: no entries after CD28; today = CD40.",
+      "expected": "A: CD19-28 infertile_post_ovulatory; CD29 onward fertile (reasons possible_new_cycle and temperature_drop), with a prompt to confirm the period. B: CD19-34 infertile_post_ovulatory (cap FHM+18 = CD34); CD35-40 and all future days fertile, with a 'period late?' message. No provisional infertile day after CD34 in either variant."
+    },
+    {
+      "name": "31 Mucus Q is never NaN (no-contribution inputs)",
+      "days": "Hstd (N = 5). CD1-3 bleeding, not assessable, complete. CD4 no bleeding, sensation slippery, appearance 'nothing seen', color none, stretchy no, complete. CD5 dry/none. Also a property test: mucusQ over every combination of sensation (5 + missing) x appearance (5 + missing) x color (8 + missing) x stretchy x unsure x notAssessable.",
+      "expected": "CD4 Q = 4: period ended, status fertile (phase closed); CD5 fertile. The property test: every result is an integer 0-4 or UNKNOWN, and is never NaN or undefined. evalMucus on a cycle where every entry has missing fields returns NONE."
+    },
+    {
+      "name": "32 Early mucus patch plus false temperature rise must not double-check",
+      "days": "Hstd. Temps: P (CD1-15), CD16 36.60, CD17 36.65, CD18 36.70 (unflagged cold), CD19-23 36.45, CD24 36.60, CD25 36.65, CD26-28 36.75, CD29-39 36.75; next period CD40. Mucus: CD1-5 as Mbase; CD6 t; CD7 f; CD8-9 slippery/egg-white (S+); CD10 S; CD11 f; CD12-20 dry (t); CD21 f; CD22-24 nothing/creamy (S); CD25 Ø; CD26+ t. All complete.",
+      "expected": "The current spec gives S = CD18 (temperature FHM 16 regular, mucus complete CD12), which is wrong. With the fix: the CD21 patch resets the peak to CD24 (P+3 = CD27); the CD16 candidate is voided (temperatures CD19-23 <= CL, and peak CD9 is outside FHM-5..FHM+3). The later candidate FHM CD25, CL 36.60, Exception 1, completes CD28 (simulated). CD6-27 fertile; CD28 fertile with eveningTransition; CD29-39 infertile_post_ovulatory."
+    },
+    {
+      "name": "33 Temperature collapse before late mucus completion",
+      "days": "Hstd. Temps: P, CD16 36.60, CD17 36.65, CD18 36.75, CD19-21 36.45, CD22-28 36.75. Mucus: CD1-10 as Mbase; CD11 f; CD12-13 S; CD14-20 S+; CD21 S; CD22 f; CD23 Ø; CD24-28 t.",
+      "expected": "The current spec gives S = CD23. With the fix: the CD16 candidate is voided (3 VALID readings <= CL before S); no later candidate confirms through CD28 (the coverline includes 36.75). No post-ovulatory phase; CD6-28 fertile."
+    },
+    {
+      "name": "34 Missing measurement time and missing usual time fail closed",
+      "days": "First cycle, no previous cycle, no usual-time setting. P + T1hi, Mbase. Variant A: the usual time is set to 06:30, but the CD17 and CD18 readings have time = null. Variant B: the usual time is never set and every reading has a time.",
+      "expected": "A: CD17 and CD18 are SUSPECT (dips); the CD16 candidate fails (both dips); no later candidate (the coverline includes 36.75); no shift, CD1-28 fertile. B: temperature evaluation blocked, reason 'set usual measurement time'; CD1-28 fertile."
+    },
+    {
+      "name": "35 Later measurement time after a settings change",
+      "days": "Hstd. P measured at 06:00 (setting 06:00). On CD16 the user changes the setting to 07:30 (retroactive edit attempted); CD16-28 = T1hi measured at 07:30. Mucus = Mbase.",
+      "expected": "The setting applies only from CD16 on. All CD16-28 highs differ by 90 min from the median time of their lows (06:00), so they are SUSPECT. No confirmation; CD6-28 fertile; the 'measurement time changed' hint is shown."
+    },
+    {
+      "name": "36 DST fall-back makes post-change readings suspect",
+      "days": "Europe/Berlin, usual time 06:30 local. CD1 = 2026-10-09, so CD17 = 2026-10-25 (DST end). P + T1hi, Mbase, Hstd.",
+      "expected": "CD17-19 (2026-10-25..10-27) are SUSPECT (offset change). The CD16 candidate fails (2 dips); no later candidate confirms (simulated). CD6-28 fertile. The same test with America/New_York and CD1 = 2026-10-16 (CD17 = 2026-11-01) gives the same result."
+    },
+    {
+      "name": "37 Calendar-date arithmetic across DST",
+      "days": "Run under TZ=Europe/Berlin, America/New_York, Pacific/Auckland. Hstd (N = 5). Case A: CD1 = 2026-10-25; CD1-4 bleeding, not assessable; CD5 spotting, dry; CD6 dry; all complete. Case B: the same with CD1 = 2026-03-28.",
+      "expected": "A: 2026-10-29 is CD5 (period / infertile_pre_ovulatory); 2026-10-30 is CD6 (fertile). B: 2026-03-30 is CD3; 2026-04-01 is CD5; 2026-04-02 is CD6 (fertile). Results are identical in every time zone."
+    },
+    {
+      "name": "38 Decimal comma input",
+      "days": "Locale de-DE. CD1-15 entered as '36,50', '36,40', ... (test 01 P values, with a comma); CD16-28 entered as '36.60', '36.65', '36.75', ... (with a dot). Mucus = Mbase, Hstd. Also try the inputs '36,5' (0.01 thermometer) and '36,555'.",
+      "expected": "'36,50' is stored as 3650 (never 3600). The outcome is identical to test 01 (S = CD18). '36,5' prompts for 2 decimals or is stored as 3650 with confirmation; '36,555' is rejected."
+    },
+    {
+      "name": "39 °F evaluation must not be done on rounded °C",
+      "days": "Hstd, unit F. CD1-15: 97.54, 97.40, 97.45, 97.40, 97.54, 97.45, 97.40, 97.45, 97.54, 97.40, 97.45, 97.40, 97.54, 97.45, 97.40; CD16 97.62; CD17 97.63; CD18-28 97.89. Mucus = Mbase.",
+      "expected": "In °F: CD16 is only +0.08 (not FHM). FHM CD18 (CL 97.63), Exception 1 completes CD21 (simulated). CD21 fertile with eveningTransition; CD22+ infertile_post_ovulatory. Any implementation that gives S = CD18 (the result after converting to °C and rounding: FHM CD16, CL 36.41) fails."
+    },
+    {
+      "name": "40 SUSPECT low must not push a higher low out of the coverline",
+      "days": "Hstd, usual time 06:30. CD1-8 = P; CD9 36.58; CD10 36.40; CD11 36.45; CD12 36.40; CD13 36.48; CD14 36.45; CD15 36.20 measured at 05:00 (SUSPECT); CD16 36.55; CD17 36.58; CD18 36.70; CD19-28 36.75. Mucus = Mbase.",
+      "expected": "Under the current spec: CL 36.48, FHM CD16, S = CD18 (wrong). With the fix (SUSPECT counted in the max, not toward the 6): the CD16 candidate has CL 36.58 and fails; FHM CD18 (CL 36.58), Exception 1 completes CD21 (simulated). CD21 fertile with eveningTransition; CD22+ infertile_post_ovulatory."
+    },
+    {
+      "name": "41 Incomplete fertile-sign entry cannot certify P+3",
+      "days": "Hstd. P + T1hi, Mbase, except CD18: sensation moist, logged 08:00, observationComplete = false. CD19-21 dry/none, complete.",
+      "expected": "CD18 counts as UNKNOWN for placing the peak (effective peak CD18), so mucus completes CD21. CD18 fertile without eveningTransition; CD21 fertile with eveningTransition; CD22+ infertile_post_ovulatory."
+    },
+    {
+      "name": "42 Period-only history still means first charted cycle",
+      "days": "6 previous known-start cycles with only bleeding logged (no BBT, no mucus). Current cycle: P + T1hi, Mbase.",
+      "expected": "firstCycle = true, N = 0 (CD1-5 period / fertile). Temperature needs the extra reading, so it completes CD19; S = CD19; CD20+ infertile_post_ovulatory. Not CD18."
+    },
+    {
+      "name": "43 Bleed too soon after the previous FHM gets no 5-day rule",
+      "days": "Previous cycle: S on CD18 (FHM CD16), then 'period started' confirmed on prev CD22 (FHM + 6). Current cycle: CD1-4 bleeding, not assessable; CD5 spotting, dry; CD6 dry; all complete. Fewer than 12 cycles.",
+      "expected": "Gate fails (CD1 < FHM + 10), so N = 0. CD1-5 period / fertile; CD6 fertile."
+    },
+    {
+      "name": "44 Lock ending mid-cycle leaves the cycle without infertile days",
+      "days": "Breastfeeding context from before CD1 until CD10 (ended by the user). P + T1hi, Mbase. The next cycle has the same data.",
+      "expected": "This cycle: CD1-10 fertile (reason method_not_supported_postpartum); CD11-28 fertile (affected cycle); no eveningTransition. Next cycle: firstCycle = true, N = 0, S = CD19."
+    },
+    {
+      "name": "45 'Unsure' on a dry day closes the pre-ovulatory phase",
+      "days": "Hstd (N = 5). CD1-4 bleeding, not assessable, complete. CD5 no bleeding, dry + nothing seen + unsure, complete.",
+      "expected": "CD1-4 period / infertile_pre_ovulatory; CD5 fertile."
+    },
+    {
+      "name": "46 Recalled entries do not open infertile days, and revisions alert",
+      "days": "Hstd (N = 5). CD1-2 bleeding (logged on time). CD3 and CD4 'dry / nothing seen, complete', both entered on CD5 at 20:00. CD5 dry, complete at 20:00. Separately: CD2 was shown infertile, and on CD6 the user edits CD2's mucus to moist; intercourse is logged on CD2.",
+      "expected": "CD3 fertile (recalled, so UNKNOWN); CD4-5 fertile. After the CD6 edit, CD2 becomes fertile and a blocking alert lists the CD2 intercourse, with emergency contraception information."
+    },
+    {
+      "name": "47 After-midnight entry and early completion",
+      "days": "Hstd (N = 5). CD1-3 bleeding, complete. At 00:30 on the CD4 date the user logs 'dry / nothing seen, complete' meaning the CD3 evening. On CD4 at 07:00 the user taps observationComplete for CD4.",
+      "expected": "The app asks for the date and defaults to CD3. The CD4 completion at 07:00 is refused; CD4 shows fertile, reason awaiting_evening_observation, until a completion at or after 18:00."
+    },
+    {
+      "name": "48 compatiblePre strictness on bleeding days",
+      "days": "Hstd (N = 5). CD1 bleeding heavy, not assessable (bleeding), complete. CD2 bleeding light, mucus 'not assessable (semen)', complete. CD3 entry exists and is complete, but has no bleeding field and no mucus.",
+      "expected": "CD1 period / infertile_pre_ovulatory; CD2 period / fertile (phase closed); CD3 fertile."
+    },
+    {
+      "name": "49 Imported temperatures without metadata block evaluation",
+      "days": "Hstd. P + T1hi typed manually, except CD16-18 imported from Apple Health with a source bundle other than the app (no route or thermometer). Mucus = Mbase.",
+      "expected": "Temperature evaluation NONE (blocked: unmapped device). CD6-28 fertile; the next cycle has N = 0."
+    },
+    {
+      "name": "50 One-decimal readings on a two-decimal profile",
+      "days": "Hstd; thermometer profile 0.01 °C. Every reading has 0 as the hundredths digit: CD1-15 alternating 36.40 and 36.50; CD16 36.60; CD17 36.70; CD18-28 36.80. Mucus = Mbase.",
+      "expected": "Resolution warning and block; no post-ovulatory phase; CD6-28 fertile."
+    },
+    {
+      "name": "51 Short uncharted cycle shortens N",
+      "days": "Previous cycle double-checked, FHM CD15. Three cycles ago: a known-start, 21-day cycle with temperatures missing on CD8-14 (no FHM). Current cycle: CD1-5 bleeding, not assessable; CD6 dry.",
+      "expected": "pseudo-FHM = 21 - 16 = 5, so cand = -3 and N = 0. CD1-5 period / fertile."
+    },
+    {
+      "name": "52 Re-confirmation needs the cycle's own route",
+      "days": "As test 26, but the CD22-25 readings are vaginal (36.85), with oral readings for the rest of the cycle.",
+      "expected": "CD22-28 fertile; no eveningTransition on CD25."
+    },
+    {
+      "name": "53 Reopened-unresolved cycle does not count toward 12",
+      "days": "12 earlier cycles with S, FHM CD15 each; one of them (not the previous one) ended REOPENED without re-confirmation. Current-cycle data as test 22.",
+      "expected": "Only 11 cycles count, so N = 5. CD6-7 fertile."
+    }
+  ]
+}

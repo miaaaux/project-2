@@ -1,0 +1,428 @@
+{
+ "library": {
+  "exercises": [
+   {
+    "name": "Cobra pose (gentle backbend)",
+    "category": "yoga (Rakhshaee pose 1 of 3)",
+    "steps": [
+     "Lie face down on a mat, legs hip-width apart, tops of the feet on the floor.",
+     "Place your hands flat under or just in front of your shoulders, elbows tucked in.",
+     "Breathe in and slowly press up to lift your head and chest. Keep your hips and pelvis on the floor. Keep the elbows bent for a gentle version, or straighten them only if your lower back is comfortable.",
+     "Relax your shoulders down, away from your ears, and breathe slowly into your belly.",
+     "Breathe out and lower yourself slowly. Nationwide Children's warns this is a big stretch for the lower back.",
+     "Rest in child's pose (kneel, sit back on your heels, fold forward, arms resting) for a few breaths before you repeat."
+    ],
+    "dose": "Hold for 5 slow belly breaths (Nationwide Children's PDF) or 30-60 s if comfortable (Nationwide Children's web page). App default is 3 rounds. The Rakhshaee trial's own hold time and repetitions were not found (unverified).",
+    "ok_during_bleeding": true,
+    "evidence": "Rakhshaee 2011 RCT (J Pediatr Adolesc Gynecol 24(4):192-196; PMID 21514190): 92 students aged 18-22 (50 yoga, 42 control). Cycle 1 was a baseline. In cycles 2-3 the yoga group did cobra, cat and fish poses during the luteal phase. Pain intensity (VAS) and pain duration in hours fell significantly versus control (P<0.05). Quality is low: PEDro 4/10, with no concealed allocation, no blinding and no ITT analysis. The pose instructions above come from Nationwide Children's Hospital patient guidance, not from the trial. The trial did the poses in the luteal phase, so safety during bleeding was not tested. NHS/HSE recommend gentle exercise including yoga for period pain.",
+    "cautions": "Skip or keep the elbows bent if you have low-back pain or a back injury. Stop if you feel sharp back or pelvic pain. Do not do it in pregnancy without a clinician's advice.",
+    "source_url": "https://www.qigonginstitute.org/abstract-print/6371"
+   },
+   {
+    "name": "Cat-cow (cat pose)",
+    "category": "yoga (Rakhshaee pose 2 of 3) / mobility",
+    "steps": [
+     "Start on your hands and knees, hands under your shoulders and knees under your hips.",
+     "Breathe in: let your belly drop toward the floor and lift your chin and tailbone (cow).",
+     "Breathe out: round your back up toward the ceiling, tuck your chin and tailbone, and gently draw your belly in (cat).",
+     "Move slowly with your breath and stay in a range that feels comfortable."
+    ],
+    "dose": "5-10 slow rounds (Nationwide Children's PDF), or stay 2-3 breaths in each position (Nationwide Children's web page). The trial's dose is unverified.",
+    "ok_during_bleeding": true,
+    "evidence": "Cat pose is one of the three poses in the Rakhshaee 2011 RCT (see cobra: low quality, PEDro 4/10, significant reductions in VAS pain intensity and pain duration). Cat-camel also appears in the core-stability arms of registered, unpublished trials (NCT05709951). Instructions are from Nationwide Children's patient guidance.",
+    "cautions": "Put padding under your knees if needed. Stop if wrists or knees hurt; you can do it on your forearms instead.",
+    "source_url": "https://www.nationwidechildrens.org/yoga-exercises-and-menstrual-cramps"
+   },
+   {
+    "name": "Supported fish pose (chest opener on a pillow)",
+    "category": "yoga (Rakhshaee pose 3 of 3) / restorative",
+    "steps": [
+     "Sit on the floor with a firm pillow or folded blanket placed lengthwise behind you.",
+     "Lie back so the pillow supports your upper back and head (Nationwide Children's: a pillow under the back and head). Do not drop your head back onto its crown as in the classic fish pose.",
+     "Keep your legs straight (or bend your knees if your lower back complains). Rest your arms at your sides with palms up.",
+     "Breathe gently into your belly and chest.",
+     "To come out, roll onto your side and push up with your hands."
+    ],
+    "dose": "Stay as long as it feels comfortable. App default is 30-60 s, building to 1-2 min. The trial's hold time is unverified.",
+    "ok_during_bleeding": true,
+    "evidence": "Third pose of the Rakhshaee 2011 RCT (low-quality evidence, see cobra). The supported version follows Nationwide Children's patient guidance and is a safer adaptation than the classic head-on-floor fish pose. The exact version used in the trial is unverified.",
+    "cautions": "Skip if you have neck problems or feel dizzy. Never put weight on the top of your head.",
+    "source_url": "https://www.nationwidechildrens.org/yoga-exercises-and-menstrual-cramps"
+   },
+   {
+    "name": "Pelvic tilt / pelvic rocking",
+    "category": "stretch / mobility (pelvis)",
+    "steps": [
+     "Lie on your back with knees bent and feet flat on the floor, hip-width apart.",
+     "Breathe out: gently tip your pelvis so your lower back flattens toward the floor, tightening your lower belly a little.",
+     "Breathe in: let the pelvis roll back so your lower back arches slightly away from the floor.",
+     "Keep rocking slowly and smoothly with your breath. Your upper body stays relaxed."
+    ],
+    "dose": "10-15 slow tilts, 1-2 sets (app default; no trial dose found).",
+    "ok_during_bleeding": true,
+    "evidence": "Indirect. 'Pelvic motions' are part of the combined-exercise program in Kirmizigil & Demiralp 2020 (registry NCT03625375: aerobic, stretching, Kegels, pelvic motions and relaxation; 28 sedentary women, 3x/week for 8 weeks; authors report the combined program was effective; PEDro 4/10). 'Pelvic stretching and pelvic rocking' (15 min, followed by treadmill) were used in a feasibility study (ACTRN12613000073707). The effect of this exercise on its own is not established. The step-by-step is standard exercise practice, not a trial text.",
+    "cautions": "Use small, comfortable movements. Stop if back or pelvic pain sharply increases.",
+    "source_url": "https://clinicaltrials.gov/study/NCT03625375"
+   },
+   {
+    "name": "Butterfly (inner-thigh / groin) stretch",
+    "category": "stretch (groin/pelvis)",
+    "steps": [
+     "Sit tall on the floor (on a folded blanket if your back rounds).",
+     "Bring the soles of your feet together and let your knees fall out to the sides.",
+     "Hold your ankles or feet and lengthen your spine.",
+     "Breathe out and lean forward slightly from your hips until you feel a gentle stretch in your inner thighs and groin. Do not bounce.",
+     "Breathe slowly, then sit up slowly."
+    ],
+    "dose": "Hold 20-30 s, 2-3 times (app default; no trial dose found).",
+    "ok_during_bleeding": true,
+    "evidence": "Indirect. Vaziri 2015 RCT (J Family Reprod Health 9(1):23-28; 105 students, aerobic vs stretching vs control, 3x/week for 8 weeks or two cycles) used 10 stretches of the abdomen, pelvis and groin, and both exercise groups reduced dysmenorrhea severity versus control. The specific stretches (shown in the paper's appendix figures) were not seen, so this exact stretch is a representative groin stretch and is unverified as a trial exercise.",
+    "cautions": "Keep it gentle if you have hip or groin pain, or sit with your knees supported on pillows.",
+    "source_url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4405513/"
+   },
+   {
+    "name": "Glute bridge",
+    "category": "core strength",
+    "steps": [
+     "Lie on your back with knees bent and feet flat, hip-width apart, arms by your sides.",
+     "Breathe out, gently brace your belly and squeeze your buttocks.",
+     "Lift your hips until your shoulders, hips and knees form a straight line. Don't over-arch your back.",
+     "Hold briefly while breathing, then lower slowly, one vertebra at a time."
+    ],
+    "dose": "10 reps with a 3-5 s hold at the top, 1-2 sets (app default).",
+    "ok_during_bleeding": true,
+    "evidence": "Indirect. An 8-week core-stability RCT (Iran; 34 women aged 18-25; 3 sessions/week of 45-60 min) assessed pain severity, duration and analgesic use, but its results were not visible in the search results. Bridge is listed in the core arms of registered trials (NCT05709951: bridge, plank, cat-camel, curl-ups, 20 min, 8 weeks; not published). The AAFP summary of the Cochrane review lists core strengthening among the low-intensity exercises that improved pain versus no exercise. Overall low certainty.",
+    "cautions": "Reduce the range or skip if the pelvis or lower back hurts. Breathe throughout and don't hold your breath.",
+    "source_url": "https://jmr.tums.ac.ir/index.php/jmr/article/view/241"
+   },
+   {
+    "name": "Modified forearm plank",
+    "category": "core strength",
+    "steps": [
+     "Lie face down, then come up onto your forearms with elbows under your shoulders.",
+     "Keep your knees on the floor (easier) or lift onto your toes (harder).",
+     "Make a straight line from head to knees (or heels). Gently draw your belly in and don't let your hips sag.",
+     "Breathe normally throughout. Lower your knees to rest."
+    ],
+    "dose": "Hold 10-30 s, 3 times, with 30 s rest (app default). Progress the hold time over weeks.",
+    "ok_during_bleeding": true,
+    "evidence": "Same indirect core-strength evidence as the glute bridge (plank appears in registered core-stability protocols; the Cochrane/AAFP summary includes core strengthening). No trial of plank alone. Low certainty.",
+    "cautions": "On heavy-flow or high-pain days, use the knees-down version or skip it. Stop if pain increases.",
+    "source_url": "https://clinicaltrials.gov/study/NCT05709951"
+   },
+   {
+    "name": "Bodyweight squat + heel raise",
+    "category": "strength (lower body)",
+    "steps": [
+     "Stand with feet hip-width apart. Hold a chair back if needed.",
+     "Squat: push your hips back as if sitting into a chair, bend your knees to a comfortable depth, keep your chest up, then stand up by pushing through your heels.",
+     "After the squats, rise slowly onto the balls of your feet (heel raise) and lower slowly."
+    ],
+    "dose": "10 squats + 10-15 heel raises, 1-2 rounds (app default).",
+    "ok_during_bleeding": true,
+    "evidence": "The Tsai 2024 network meta-analysis table describes the Shahr-jerdy 2012 'stretching' protocol (2x/day, 10 min, 3 days/week, 8 weeks) as including typical strength exercises such as abdominal crunch, squat and heel raise. This is a secondary description that could not be checked against the original paper (unverified). Shahr-jerdy: 179 girls aged 15-17. Pain intensity 7.65 to 4.88, pain duration 7.48 to 3.86 h, analgesic tablets 1.65 to 0.79. PEDro 4/10.",
+    "cautions": "Use a chair for balance. Keep the depth shallow if knees hurt.",
+    "source_url": "https://sportsmedicine-open.springeropen.com/articles/10.1186/s40798-024-00718-4/tables/1"
+   },
+   {
+    "name": "Progressive muscle relaxation (PMR) with slow belly breathing",
+    "category": "relaxation",
+    "steps": [
+     "Lie or sit comfortably. Put one hand on your belly and take a few slow breaths so your belly rises on the in-breath.",
+     "Working from feet to face (feet, calves, thighs, buttocks, belly, hands, arms, shoulders, face), tense one muscle group firmly but not painfully for about 10 s while breathing in.",
+     "Breathe out slowly and let that muscle group go completely. Notice the difference for about 15-20 s.",
+     "Move to the next group.",
+     "Finish with 1-2 minutes of slow belly breathing."
+    ],
+    "dose": "About 15-20 min per session (app default). Trial protocols describe tensing for about 10 s with slow release (NCT05340101) and 20-30 min sessions 3x/week (a planned trial). Session length in Celenay 2024 is unverified.",
+    "ok_during_bleeding": true,
+    "evidence": "Tsai 2024 network meta-analysis (Sports Med Open 10:63; 29 RCTs, 1,808 participants) ranked 'relaxation exercise' most effective for pain at 4 weeks (MD -3.56/10 cm, 95% CI -5.03 to -2.08) and 8 weeks (-3.87, 95% CI -5.51 to -2.22), with the lowest dropout. How Tsai defined 'relaxation exercise' could not be confirmed (unverified). Toprak Celenay et al. 2024 RCT (Taiwan J Obstet Gynecol): Jacobson PMR 3x/week from estimated ovulation to the start of the next period reduced pain intensity, menstrual symptoms and anxiety more than control. Small trials, moderate-to-low certainty.",
+    "cautions": "Skip tensing any muscle group that is injured or cramping (for example, the belly during strong cramps); just breathe and relax that area. Stop if tensing causes cramps.",
+    "source_url": "https://doaj.org/article/135c785e09a5491696ad6c69738726c9"
+   },
+   {
+    "name": "Brisk walking (or other moderate aerobic exercise)",
+    "category": "aerobic",
+    "steps": [
+     "Warm up with 5 minutes of easy walking.",
+     "Speed up to a brisk pace where you can talk but not sing. Cycling, swimming, dancing or a treadmill also count.",
+     "Keep it up for the session time; splitting it into shorter bouts is fine.",
+     "Cool down with 5 minutes of easy walking."
+    ],
+    "dose": "45-60 min per session, at least 3 sessions/week, sustained for at least 8 weeks. On painful or heavy days, use a gentle 20-30 min walk instead.",
+    "ok_during_bleeding": true,
+    "evidence": "Cochrane 2019 (Armour et al., CD004142; 12 RCTs, 854 women): most included studies used at least 3 sessions/week of about 45-60 min. Exercise vs no exercise: SMD -1.86 (95% CI -2.06 to -1.66; 9 RCTs, n=632; I\u00b2=91%; low-quality evidence), described as over twice the minimum noticeable reduction. It is unclear whether shorter or less frequent sessions work. Kannan 2019 RCT (Contemp Clin Trials; 70 women): 4 weeks of supervised treadmill aerobic training 3x/week, starting the day after the period ended, then home exercise for 6 months, improved pain intensity and quality at 4 weeks versus usual care. Vaziri 2015: the aerobic group also reduced severity versus control. NHS/HSE recommend walking, swimming and cycling for period pain.",
+    "cautions": "If flow is very heavy or you feel dizzy, breathless or unusually tired, keep it gentle and talk to a doctor (possible anaemia). Drink water.",
+    "source_url": "https://www.cochrane.org/evidence/CD004142-exercise-dysmenorrhoea"
+   }
+  ],
+  "routines": [
+   {
+    "name": "Luteal yoga: 3 poses",
+    "minutes": 20,
+    "exercises": [
+     "Cobra pose (gentle backbend)",
+     "Cat-cow (cat pose)",
+     "Supported fish pose (chest opener on a pillow)"
+    ],
+    "schedule": "Daily in the luteal phase (about 20 min per session according to a secondary Japanese summary of the trial; the trial's daily frequency, holds and repetitions are unverified). Cycle through cobra, then child's-pose rest, then cat-cow, then supported fish, repeating until the time is up. Keep it up for at least 2 cycles; the trial ran 2 intervention cycles after 1 baseline cycle.",
+    "cycle_timing": "Luteal phase: start the day after the app confirms the BBT thermal shift (ovulation has passed) and continue until bleeding starts. If no shift is confirmed, start about 14 days before the predicted period. It can continue gently during bleeding, but that was not part of the trial.",
+    "based_on": "Rakhshaee 2011 RCT (J Pediatr Adolesc Gynecol 24:192-196; n=92; PEDro 4/10; low quality). Pose instructions from Nationwide Children's Hospital."
+   },
+   {
+    "name": "10-minute stretch & strength (2x/day, 3 days/week)",
+    "minutes": 10,
+    "exercises": [
+     "Pelvic tilt / pelvic rocking",
+     "Butterfly (inner-thigh / groin) stretch",
+     "Cat-cow (cat pose)",
+     "Bodyweight squat + heel raise",
+     "Glute bridge",
+     "Modified forearm plank (optional)"
+    ],
+    "schedule": "2 sessions of 10 minutes each per day (for example morning and evening), on 3 non-consecutive days a week, for 8 weeks. Reassess pain after 2 cycles.",
+    "cycle_timing": "Any phase, continuously through the cycle (Shahr-jerdy did not tie it to a phase). Continue on bleeding days if comfortable, and drop the plank or squats on heavy or high-pain days.",
+    "based_on": "Dosing from Shahr-jerdy 2012 (Biomed Hum Kinet; n=179 girls aged 15-17; pain 7.65 to 4.88, duration 7.48 to 3.86 h, tablets 1.65 to 0.79; PEDro 4/10). The exact trial exercises are unverified: the Tsai 2024 table describes the protocol as including crunch, squat and heel raise. Stretch content approximated from Vaziri 2015 (10 abdomen/pelvis/groin stretches, 3x/week for 8 weeks) and Kirmizigil 2020 (pelvic motions)."
+   },
+   {
+    "name": "Weekly aerobic goal",
+    "minutes": 45,
+    "exercises": [
+     "Brisk walking (or other moderate aerobic exercise)"
+    ],
+    "schedule": "3 sessions per week of 45-60 min at moderate intensity (talk-but-not-sing), sustained for at least 8 weeks. The 10-minute routine or Pilates/yoga classes can count toward the 3 exercise days.",
+    "cycle_timing": "All cycle long. Kannan started supervised training the day after the period ended, so the follicular phase is a good time to start a streak. During bleeding, swap in a gentle 20-30 min walk or the yoga/relaxation routines if needed.",
+    "based_on": "Cochrane 2019 Armour et al. (most trials at least 3x/week, about 45-60 min; SMD -1.86; low-quality evidence); Kannan 2019 treadmill RCT (n=70); Vaziri 2015 aerobic arm."
+   },
+   {
+    "name": "Relax & release (PMR) - optional 4th",
+    "minutes": 20,
+    "exercises": [
+     "Progressive muscle relaxation (PMR) with slow belly breathing"
+    ],
+    "schedule": "3 times per week. Can also be used on demand during cramps, with the belly-tensing step skipped.",
+    "cycle_timing": "From estimated ovulation (BBT shift confirmed) until the next period starts, as in Celenay 2024.",
+    "based_on": "Toprak Celenay 2024 RCT (Jacobson PMR from ovulation to menses, 3x/week); Tsai 2024 NMA (relaxation exercise ranked first at 4 and 8 weeks; its definition is unverified)."
+   }
+  ],
+  "weekly_goal": "Default goal: exercise on 3 days per week, sustained for at least 8 weeks (about 2 cycles) before judging whether it helps. Each day can be a 45-60 min aerobic session (the Cochrane-typical dose, about 135-180 min/week) or the 2x10-min stretch & strength routine (the Shahr-jerdy dose). Add the luteal yoga poses daily, or PMR 3x/week, from the confirmed BBT shift until the period starts. Count days, not minutes, for streaks. Show a 'pain trend' after cycles 2 and 3 comparing peak pain, pain hours and painkiller count with the baseline cycle. Note: the Cochrane review says it is unknown whether shorter or less frequent exercise works as well, or whether the benefit lasts after stopping, so the app should not promise a specific pain reduction.",
+  "logging": "Per session (auto-filled where possible): date/time; cycle day and phase (auto from the cycle and BBT data: follicular, fertile, luteal or bleeding); bleeding today and flow level (reuse the bleeding log); routine and the exercises actually completed (IDs); duration in minutes; intensity (perceived exertion 0-10, or easy/moderate/hard); pain right now before and 10-30 min after (0-10 numeric scale); pain location (lower belly, back, thighs); any exercise that made pain worse (per-exercise flag, so the app can hide it later); stopped early? and why (pain, dizziness, time, other); optional notes. Per cycle (for outcomes that match the trial measures): peak period pain 0-10 (VAS-equivalent), total pain duration in hours, number of painkiller doses (Shahr-jerdy's outcomes), days when pain limited daily activities, plus links to the existing sleep (8 h target), magnesium and sugar logs. Also count exercise days per week toward the goal.",
+  "safety": [
+   "Scope: these exercises are for primary dysmenorrhea (ordinary period cramps). Exercise can be used alone or alongside NSAIDs (Cochrane). It is not a substitute for medical care, and the app should say so.",
+   "Stop the exercise if pain becomes sharp, stabbing or clearly worse during or after it, or if you feel dizzy, faint or short of breath. Flag that exercise in the log and don't suggest it again automatically.",
+   "See a doctor (NHS/HSE): if periods become more painful, heavier or irregular, if pain stops you doing daily activities, if you bleed between periods or after sex, or if you have pain during sex or when using the toilet. Get urgent help (urgent GP or NHS 111) if pelvic or period pain is much worse than usual and painkillers aren't helping.",
+   "Pregnancy: the user relies on natural contraception, so if a period is late or unusually light and there is cramping (especially severe one-sided pain, shoulder-tip pain or fainting), prompt a pregnancy test and urgent care rather than exercise. This ectopic-pregnancy warning is general clinical knowledge; no source for it was checked in this research. If pregnant or postpartum, don't use the plank, cobra or fish without a clinician's OK.",
+   "Pelvic floor: don't include Kegels or pelvic-floor strengthening by default. Pelvic-health physiotherapists warn that in a tight/overactive pelvic floor, strengthening can worsen pelvic pain; relaxation and breathing come first (expert commentary, not dysmenorrhea trials). If the user reports pain with sex or tampons, urinary urgency or constipation, suggest a pelvic-health physio.",
+   "Heavy flow or anaemia: on very heavy days, or with fatigue, breathlessness or dizziness, offer only gentle options (breathing/PMR, supported fish, short walk), and suggest seeing a doctor about heavy bleeding and iron levels. The anaemia link is general clinical knowledge, not verified against a source here.",
+   "Neck and back: never do the classic fish pose with weight on the head; use the pillow-supported version. Keep cobra low (elbows bent) if the lower back is sensitive. Pad the knees for cat-cow and plank.",
+   "Expectations: the evidence is low quality (small, unblinded trials; Cochrane rates it low-quality; key trials score PEDro 4/10). Benefits showed up after 4-8 weeks or 2-3 cycles of regular practice, mostly in women under 25, and it is unknown whether benefits persist after stopping.",
+   "Teens: Shahr-jerdy studied 15-17-year-olds, so the routines are suitable for adolescents. For under-16s, follow the HSE's advice that aspirin should not be given (relevant if the app ever mentions painkillers)."
+  ],
+  "sources": [
+   "Cochrane plain-language summary, Armour et al. 2019 Exercise for dysmenorrhoea (CD004142) - https://www.cochrane.org/evidence/CD004142-exercise-dysmenorrhoea",
+   "Cochrane Library record CD004142.pub4 - https://cochranelibrary.com/cdsr/doi/10.1002/14651858.CD004142.pub4",
+   "PubMed 31538328 (Cochrane review) - https://pubmed.ncbi.nlm.nih.gov/31538328/",
+   "PMC full text of Cochrane review (seen in results only) - https://pmc.ncbi.nlm.nih.gov/articles/PMC6753056/",
+   "AAFP Cochrane for Clinicians summary (SMD -1.86; low- and high-intensity exercise) - https://www.aafp.org/afp/2021/0501/p525.html",
+   "Tsai et al. 2024 network meta-analysis, Sports Medicine - Open 10:63 (PMC) - https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11139836/",
+   "Tsai et al. 2024, publisher page - https://sportsmedicine-open.springeropen.com/articles/10.1186/s40798-024-00718-4",
+   "Tsai et al. 2024, Table 1 (trial protocol descriptions) - https://sportsmedicine-open.springeropen.com/articles/10.1186/s40798-024-00718-4/tables/1",
+   "Shahr-jerdy et al. 2012, Biomedical Human Kinetics (DOAJ record) - https://doaj.org/article/b835f0eb00664795a72706dd5146638e",
+   "Shahr-jerdy et al. 2012 (publisher) - https://reference-global.com/article/10.2478/v10101-012-0024-y",
+   "PEDro record, Shahr-jerdy 2012 (4/10) - https://search.pedro.org.au/search-results/record-detail/68137",
+   "Rakhshaee 2011 abstract (cobra, cat, fish; luteal phase) - https://www.qigonginstitute.org/abstract-print/6371",
+   "PEDro record, Rakhshaee 2011 (4/10) - https://search.pedro.org.au/search-results/record-detail/29217",
+   "eJIM (Japan MHLW) summary of Rakhshaee 2011 (about 20 min/session, at least 14 luteal days) - https://www.ejim.mhlw.go.jp/doc/pdf/yoga/14-nyouroseikikeinosikkan-5.pdf",
+   "Nationwide Children's Hospital, Yoga Exercises and Menstrual Cramps - https://www.nationwidechildrens.org/yoga-exercises-and-menstrual-cramps",
+   "Nationwide Children's Hospital, Yoga for Period Pain PDF - https://www.nationwidechildrens.org/-/media/nch/family-resources/helping-hands/documents/hhiv150pdf.pdf",
+   "Vaziri et al. 2015, aerobic vs stretching, J Family Reprod Health 9(1):23-28 - https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4405513/",
+   "Kirmizigil & Demiralp 2020, Arch Gynecol Obstet - https://link.springer.com/article/10.1007/s00404-020-05579-2",
+   "ClinicalTrials.gov NCT03625375 (Kirmizigil combined exercises) - https://clinicaltrials.gov/study/NCT03625375",
+   "PEDro record, Kirmizigil 2020 (4/10) - https://search.pedro.org.au/search-results/record-detail/61109",
+   "ANZCTR ACTRN12613000073707 (pelvic stretching/rocking + treadmill feasibility) - https://anzctr.org.au/ACTRN12613000073707.aspx",
+   "Kannan et al. 2019 treadmill aerobic RCT (PolyU record) - https://research.polyu.edu.hk/en/publications/effectiveness-of-a-treadmill-based-aerobic-exercise-intervention--2/",
+   "Core stability 8-week RCT (Iran, J Med Res) - https://jmr.tums.ac.ir/index.php/jmr/article/view/241",
+   "ClinicalTrials.gov NCT05709951 (functional vs core stability; bridge, plank, cat-camel, curl-up) - https://clinicaltrials.gov/study/NCT05709951",
+   "Pilates vs yoga in adolescents (SPORT TK) - https://revistas.um.es/sportk/article/view/605701",
+   "Pilates 8-week trial (Iranian J Obstet Gynecol Infertil) - https://ijogi.mums.ac.ir/article_11627_en.html",
+   "News summary of Pilates/aerobic meta-analysis (16 RCTs) - https://www.medznat.ru/en/news/medical-news/aerobic-exercise-especially-pilates-shown-to-eff",
+   "Toprak Celenay et al. 2024, PMR RCT, Taiwan J Obstet Gynecol (DOAJ) - https://doaj.org/article/135c785e09a5491696ad6c69738726c9",
+   "ClinicalTrials.gov NCT05340101 (PMR protocol) - https://clinicaltrials.gov/study/NCT05340101",
+   "Hinge Health, hypertonic pelvic floor - https://www.hingehealth.com/gb/en/resources/articles/hypertonic-pelvic-floor/",
+   "FeminaPT (Heather Jeffcoat DPT), Kegels don't always help - https://feminapt.com/blog/well-and-good-your-pelvic-floor-muscles-don-t-always-benefit-from-kegels/",
+   "NHS Period pain - https://www.nhs.uk/conditions/period-pain/",
+   "HSE Period pain - https://www2.hse.ie/conditions/period-pain/"
+  ],
+  "unverified": [
+   "Method limit: WebFetch failed with DNS errors on every host tried (reference-global, hermanwallace, ejim.mhlw.go.jp, springeropen), and direct HTTPS was blocked by the proxy. Everything here comes from search-result snippets and abstracts; no full text was read.",
+   "Cochrane '~25 mm less pain on a 100 mm VAS': not confirmed. Confirmed are SMD -1.86 (95% CI -2.06 to -1.66; 9 RCTs, n=632; I\u00b2=91%; low-quality evidence), the description 'over twice the minimum noticeable difference', and that most trials used at least 3x/week of about 45-60 min.",
+   "Shahr-jerdy 2012: which exercises were used is NOT confirmed. The Tsai 2024 table describes them as including abdominal crunch, squat and heel raise (a secondary source that conflicts with the 'stretching' label). Abdomen/pelvis/groin stretches are confirmed only for Vaziri 2015 (10 stretches), and the specific stretches were not seen.",
+   "Rakhshaee 2011: hold time and repetitions per pose were not found. About 20 min/session and 'at least 14 days of the luteal phase' come only from a secondary Japanese summary (eJIM). How the poses were performed (e.g., the fish variant) is unverified.",
+   "Tsai 2024: what 'relaxation exercise' consisted of (e.g., Jacobson PMR, breathing, or stretching) and which trials were in that node were not confirmed.",
+   "Kirmizigil 2020: the exercise content (aerobic, stretching, Kegels, pelvic motions, relaxation) comes from the registry snippet. Effect sizes were not seen. Duration is reported as 8 weeks in the Springer abstract but 'two menstrual cycles' in the Turkish abstract.",
+   "Kannan 2019: training intensity (e.g., 70-85% HRmax) and session length are not confirmed. The '6% at 4 weeks / 22% at 6 months' figures come from an unidentified news summary in search results, and the search tool noted the abstract's CIs looked inconsistent.",
+   "Vaziri 2015: session duration and the type of aerobic exercise are not confirmed.",
+   "Core-stability RCT (Iran, n=34): results not seen. NCT05709951 and NCT07080580 are registered, not published.",
+   "Pilates meta-analysis (16 RCTs, 918 women; 31-45 min, at most 2x/week optimal; moderate GRADE): seen only in a news summary. Authors and journal are unverified, and it conflicts with the Cochrane 3x/week pattern.",
+   "Celenay 2024 PMR: session length not confirmed. The 20-30 min figure is from a separate planned trial; the 10 s tense comes from the NCT05340101 registry.",
+   "All hold times, reps and step-by-step for pelvic tilt, butterfly, glute bridge, plank and squat/heel raise are standard exercise practice chosen as app defaults, not taken from trial protocols. Yoga holds are from Nationwide Children's patient guidance, not the trial.",
+   "Safety during bleeding was not specifically tested for any exercise. 'ok_during_bleeding' rests on NHS/HSE advice that gentle exercise (walking, swimming, cycling, yoga, Pilates) helps period pain, and on general practice.",
+   "The ectopic-pregnancy and anaemia cautions are general clinical knowledge and were not checked against a source in this research.",
+   "Pelvic-floor caution is based on physiotherapy expert commentary (Hinge Health, FeminaPT), not on dysmenorrhea trials."
+  ]
+ },
+ "check": {
+  "checks": [
+   {
+    "claim": "Rakhshaee 2011 RCT, J Pediatr Adolesc Gynecol 24(4):192-196, PMID 21514190: 92 students aged 18-22 (50 yoga, 42 control), cobra/cat/fish poses, VAS pain intensity and pain duration in hours fell significantly vs control (P<0.05)",
+    "status": "confirmed",
+    "note": "Search snippets of the abstract confirm the citation, PMID, DOI 10.1016/j.jpag.2011.01.059, n=92 (50/42), ages 18-22, the three poses, VAS plus pain duration in hours, and P<0.05 both within the group and against control. Three cycles were evaluated. The 'cycle 1 baseline, poses in luteal phase of cycles 2-3' detail comes only from secondary summaries (qigonginstitute abstract print, Herman & Wallace blog). WebFetch of qigonginstitute.org failed with a DNS error.",
+    "url": "https://www.qigonginstitute.org/abstract-print/6371"
+   },
+   {
+    "claim": "Rakhshaee 2011 quality: PEDro 4/10, no concealed allocation, no blinding, no ITT",
+    "status": "unverifiable",
+    "note": "The PEDro record (29217) came up in results, but its score and item breakdown were not visible in any snippet I saw. Keep as unverified unless the record is read.",
+    "url": "https://search.pedro.org.au/search-results/record-detail/29217"
+   },
+   {
+    "claim": "Luteal yoga routine schedule: 'Daily in the luteal phase', about 20 min per session (eJIM)",
+    "status": "corrected",
+    "note": "The eJIM Japanese summary (seen via search only) gives 20 min per session for at least 14 luteal days across three cycles, but does not say daily vs other frequency. A search summary of the Tsai 2024 Table 1 describes the Rakhshaee intervention as 20 min sessions THREE TIMES A WEEK, measured at 4 and 8 weeks. So 'daily' is not supported and conflicts with a secondary source. Say '20 min per session in the luteal phase; frequency unverified (one secondary source says 3x/week)' and don't default to daily as if it were the trial dose.",
+    "url": "https://sportsmedicine-open.springeropen.com/articles/10.1186/s40798-024-00718-4/tables/1"
+   },
+   {
+    "claim": "Cobra: Nationwide Children's PDF says hold 5 belly breaths and warns it is a big stretch for the lower back; its web page says 30-60 s",
+    "status": "confirmed",
+    "note": "A snippet of the NCH sheet says: 'Hold this pose for 5 big belly breaths and slowly lower back down to the floor. This is a big stretch on your lower back so lower yourself down slowly.' The search summary also says another NCH page gives 30-60 s. However, the NCH instructions press up with STRAIGHT elbows. The 'elbows bent gentle version' and the child's-pose rest between rounds are app adaptations, not NCH text, so label them as app additions. '3 rounds' is an app default. NCH pages could not be fetched (DNS error).",
+    "url": "https://www.nationwidechildrens.org/-/media/nch/family-resources/helping-hands/documents/hhiv150pdf.pdf"
+   },
+   {
+    "claim": "Cat-cow instructions and dose from Nationwide Children's (tabletop, hands under shoulders, knees under hips; 5-10 rounds or 2-3 breaths per position)",
+    "status": "corrected",
+    "note": "The NCH handout HH-IV-150 (revised 2025) opens with Cat/Cow: 'Start in a tabletop position... hands under your shoulders and your knees under your hips.' That start position is confirmed. The 5-10 rounds and 2-3 breaths doses were NOT visible in any snippet, so mark them unverified. The handout also advises doing the poses after a walk or bath when the body is warm, which is a useful tip to add. Cat is confirmed as a Rakhshaee pose. Cat-and-camel is confirmed in the core-stability arm of NCT05709951.",
+    "url": "https://www.nationwidechildrens.org/family-resources-education/health-wellness-and-safety-resources/helping-hands/yoga-exercises-and-menstrual-cramps"
+   },
+   {
+    "claim": "Supported fish with a pillow under the back and head follows Nationwide Children's guidance",
+    "status": "confirmed",
+    "note": "A search summary of the NCH 'Yoga Exercises and Menstrual Cramps' page describes a pillow on the floor with the back and head on it, legs extended, arms at the sides with palms up, held 'as long as you feel comfortable'. This was seen only through search; the page itself failed to fetch. Which fish variant Rakhshaee used is still unverified. The '30-60 s building to 1-2 min' dose is an app default.",
+    "url": "https://www.nationwidechildrens.org/yoga-exercises-and-menstrual-cramps"
+   },
+   {
+    "claim": "Glute bridge evidence: 8-week core-stability RCT (Iran, 'J Med Res'; 34 women aged 18-25; 3 sessions/week of 45-60 min); results not visible",
+    "status": "corrected",
+    "note": "The journal is the Journal of Modern Rehabilitation, not 'J Med Res': Shahrjerdi Sh, Mahmoudi F, Sheikhhoseini R, Shahrjerdi S. J Mod Rehabil 2019;13(1):113-122, DOI 10.32598/JMR.13.1.113. It had 34 non-athletic, unmarried women aged 18-25 with moderate-to-severe dysmenorrhea (17 exercise, 17 control), 3 sessions/week of 45-60 min for 8 weeks. Results ARE now visible: compared with control, pain intensity (P=0.008), pain duration (P=0.021) and painkiller count (P=0.018) fell significantly. Which exercises it used (bridge? plank?) was not seen, so the bridge and plank links to this trial stay unverified. Remove 'results not seen' from the unverified list.",
+    "url": "https://jmr.tums.ac.ir/index.php/jmr/article/view/241"
+   },
+   {
+    "claim": "NCT05709951: core-stability arm includes bridge, plank, cat-camel and curl-ups; 20 min; 8 weeks; not published",
+    "status": "corrected",
+    "note": "The registry confirms a core-stability arm (pelvic bridging, plank, cat and camel, curl-up) and a functional arm (piriformis stretch, COBRA POSE, sit-up, bridging). The schedule is reported as '4 days per week three times for 20 min (8 weeks)'. Estimated enrollment is 24, single-masked. The library leaves out the 4 days/week frequency and that cobra is in the functional arm. I did not verify whether results have been published; 'not published' is unverified.",
+    "url": "https://clinicaltrials.gov/study/NCT05709951"
+   },
+   {
+    "claim": "Kirmizigil & Demiralp 2020 (NCT03625375): combined program of aerobic, stretching, Kegels, pelvic motions and relaxation; 28 sedentary women; 3x/week for 8 weeks; effective; PEDro 4/10",
+    "status": "corrected",
+    "note": "Confirmed: Arch Gynecol Obstet 2020;302(1):153-163, PMID 32415471, DOI 10.1007/s00404-020-05579-2, 28 sedentary women, 3x/week for 8 weeks, no-intervention control, outcomes VAS, MSQ and PSQI. Menstrual symptoms and sleep quality improved, and the authors concluded combined exercise had positive effects. The published title is 'Effectiveness of functional exercises on pain and sleep quality in patients with primary dysmenorrhea: a randomized clinical trial'; the registry title is 'Effects of Combined Exercises on Primary Dysmenorrhea'. The exercise components (pelvic motions, Kegels, etc.), the VAS pain result and PEDro 4/10 were not seen in my searches (unverified). Note the program includes Kegels, which the app's own pelvic-floor safety note excludes by default.",
+    "url": "https://clinicaltrials.gov/study/NCT03625375"
+   },
+   {
+    "claim": "ACTRN12613000073707: pelvic stretching and pelvic rocking (15 min) followed by treadmill, feasibility study",
+    "status": "unverifiable",
+    "note": "Not searched within the search budget. The Kannan RCT registration is ACTRN12613001195741 (a different ID).",
+    "url": "https://anzctr.org.au/ACTRN12613000073707.aspx"
+   },
+   {
+    "claim": "Vaziri 2015 RCT, J Family Reprod Health 9(1):23-28: 105 students, aerobic vs stretching vs control, 3x/week for 8 weeks (two cycles), 10 stretches of abdomen/pelvis/groin, both groups reduced severity vs control",
+    "status": "corrected",
+    "note": "Confirmed: citation, n=105, three groups, 3x/week for 8 weeks covering two cycles, severity measured by a modified questionnaire, and both exercise groups significantly different from control. 'Pelvic, abdomen and groin' stretching and treadmill aerobic exercise come from the IRCT registry description (irct.ir trial 10826), not the paper. The figure of '10 stretches' was NOT seen (unverified). Session length is still unverified. The jfrh.tums.ac.ir fetch failed with a DNS error.",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4405513/"
+   },
+   {
+    "claim": "Shahr-jerdy 2012 (Biomed Hum Kinet): 179 girls aged 15-17; 2x/day, 10 min, 3 days/week, 8 weeks; pain 7.65 to 4.88, duration 7.48 to 3.86 h, tablets 1.65 to 0.79; PEDro 4/10",
+    "status": "confirmed",
+    "note": "The DOAJ/publisher abstract confirms Biomed Hum Kinet vol 4:127-132, 179 single girls aged 15-17 with moderate-to-severe dysmenorrhea from six high schools, 124 exercise vs 55 control, ACTIVE STRETCHING at home 3 days/week, 2x/day, 10 min, 8 weeks, and the exact figures (p<0.05). PEDro shows no concealed allocation, no blinding, no adequate follow-up and no ITT, consistent with 4/10. Missing caveat: the control group's pain duration also fell significantly (p<0.001). 'Non-consecutive days' and 'reassess after 2 cycles' are app additions, not trial details.",
+    "url": "https://doaj.org/article/b835f0eb00664795a72706dd5146638e"
+   },
+   {
+    "claim": "Shahr-jerdy protocol included abdominal crunch, squat and heel raise (Tsai 2024 Table 1)",
+    "status": "unverifiable",
+    "note": "A search summary attributes this description to the Tsai Table 1, but I could not open the table (DNS). The primary abstract calls it 'active stretching'. The library already flags this; it remains a secondary, unconfirmed description, so the squat/heel-raise item has no verified trial basis.",
+    "url": "https://sportsmedicine-open.springeropen.com/articles/10.1186/s40798-024-00718-4/tables/1"
+   },
+   {
+    "claim": "Tsai 2024 NMA (Sports Med Open 10:63; 29 RCTs, 1,808 participants): relaxation exercise ranked first at 4 weeks (MD -3.56, 95% CI -5.03 to -2.08) and 8 weeks (-3.87, 95% CI -5.51 to -2.22), with the lowest dropout",
+    "status": "corrected",
+    "note": "The pain figures, 29 RCTs, 1,808 participants, the 10-cm VAS and the categories (relaxation, strength, aerobic, yoga, mixed, Kegel) are confirmed. At 8 weeks yoga was -2.75 (95% CI -4.00 to -1.51). The dropout claim is shaky: the abstract text seen reports relaxation dropout as 'significantly lower' at -0.11 (95% CI -0.20 to 0.02). That CI crosses zero as quoted (possibly a typo for -0.02), so don't state 'lowest dropout' as established. How 'relaxation exercise' was defined is still unverified.",
+    "url": "https://doaj.org/article/67733249ed314e3db6eaa8c91eefd9eb"
+   },
+   {
+    "claim": "Toprak Celenay et al. 2024 RCT (Taiwan J Obstet Gynecol): Jacobson PMR 3x/week from estimated ovulation to the next period reduced pain intensity, symptoms and anxiety vs control",
+    "status": "confirmed",
+    "note": "Confirmed: Taiwanese J Obstet Gynecol 2024;63(3):329-335, DOI 10.1016/j.tjog.2023.10.016. PMR was given 3x/week from the estimated ovulation date until the next period, against a no-treatment control. Pain intensity, menstrual symptoms, anxiety, QoL impact and work/school performance improved more than in controls (p<0.05). The word 'Jacobson', the sample size and session length were not seen (unverified). The author list varies between records.",
+    "url": "https://doaj.org/article/135c785e09a5491696ad6c69738726c9"
+   },
+   {
+    "claim": "PMR dose: tense about 10 s (NCT05340101); 20-30 min sessions 3x/week (a planned trial)",
+    "status": "unverifiable",
+    "note": "NCT05340101 exists (title: effect of PMR exercise on primary dysmenorrhea, menstrual symptoms and QoL), but its protocol text (10 s tension) was not seen in my searches.",
+    "url": "https://clinicaltrials.gov/study/NCT05340101"
+   },
+   {
+    "claim": "Cochrane 2019 Armour CD004142: 12 RCTs, 854 women; SMD -1.86 (95% CI -2.06 to -1.66; 9 RCTs, n=632; I\u00b2=91%; low quality); most trials used at least 3x/week, about 45-60 min; unclear whether shorter or less frequent sessions work",
+    "status": "confirmed",
+    "note": "Search results confirm 12 studies with 854 women (10 trials with 754 in meta-analysis), SMD -1.86 from 9 RCTs with 632 women, low-quality evidence, most trials at least 3x/week of about 45-60 min, and that it is unknown whether shorter or less frequent sessions work. The CI and I\u00b2 were not re-seen in my snippets. The '~25 mm reduction on a 100 mm VAS' IS stated in the PubMed abstract per the search snippet, so it can come off the unverified list. Cochrane pages failed to fetch (DNS).",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/31538328/"
+   },
+   {
+    "claim": "Kannan 2019 RCT (Contemp Clin Trials; 70 women): 4 weeks of supervised treadmill aerobic training 3x/week from the day after the period ended, then 6 months at home; improved pain intensity and quality at 4 weeks vs usual care",
+    "status": "confirmed",
+    "note": "Confirmed: Contemp Clin Trials 2019;81:80-86, ACTRN12613001195741, n=70, 3x/week starting the first day after the period ended, then 6 months of home exercise. At 4 weeks pain quality and intensity improved but PRESENT pain did not. Benefits for present pain, QoL and daily function were maintained to 7 months. PEDro 6/10, higher than the other trials, so the claim that 'key trials score 4/10' should not be applied to it. The abstract's CI for pain quality looks inconsistent. Intensity and session length are still unverified.",
+    "url": "https://research.polyu.edu.hk/en/publications/effectiveness-of-a-treadmill-based-aerobic-exercise-intervention--2/"
+   },
+   {
+    "claim": "AAFP Cochrane for Clinicians lists core strengthening among the low-intensity exercises that improved pain",
+    "status": "unverifiable",
+    "note": "Not searched within the budget.",
+    "url": "https://www.aafp.org/afp/2021/0501/p525.html"
+   },
+   {
+    "claim": "NHS/HSE recommend gentle exercise (walking, swimming, cycling, yoga/Pilates). See a GP if periods are more painful, heavier or irregular, if pain stops daily activities, with bleeding between periods, or pain during sex or toileting. Urgent GP or 111 if pain is much worse than usual and painkillers aren't helping",
+    "status": "corrected",
+    "note": "NHS wording confirmed: see a GP for periods more painful/heavier/irregular, pain stopping usual activities, pain during sex or when peeing or pooing, and bleeding between periods. Urgent GP or NHS 111 if pain is 'severe or worse than usual' and painkillers have not helped; use that wording rather than 'much worse'. NHS 111 Wales names gentle exercise (yoga, swimming, walking, cycling). The main NHS page frames yoga/Pilates as relaxing activities that may help. 'Bleeding after sex' was not seen in the NHS snippet. No HSE page came up, so the HSE attributions are unverified.",
+    "url": "https://www.nhs.uk/conditions/period-pain/"
+   },
+   {
+    "claim": "Teens: follow the HSE's advice that aspirin should not be given to under-16s",
+    "status": "corrected",
+    "note": "The under-16 aspirin rule is confirmed by Northern Ireland's HealthWell (EA NI), not by an HSE page I saw. Cite a source actually seen, or mark the HSE attribution as unverified. Also, 'suitable for adolescents' overreaches: one PEDro 4/10 trial in 15-17-year-olds supports trying it, not suitability in general.",
+    "url": "https://healthwell.eani.org.uk/healthtopic/womens-health/period-problems?type_1=1"
+   },
+   {
+    "claim": "ok_during_bleeding = true for all exercises",
+    "status": "unverifiable",
+    "note": "No source tested any exercise during menses. Rakhshaee and Celenay ran in the luteal/post-ovulation phase, and Kannan started after the period ended. Cochrane reports that the included trials gave no adverse-event data, so safety, including during bleeding, is not established. The flag rests only on general NHS advice.",
+    "url": "https://www.cochrane.org/CD004142"
+   },
+   {
+    "claim": "Pelvic-floor caution (Hinge Health, FeminaPT), ectopic-pregnancy and anaemia cautions",
+    "status": "unverifiable",
+    "note": "Not checked in this pass; the library already labels them as expert commentary or general knowledge.",
+    "url": ""
+   }
+  ],
+  "corrections_summary": "I checked the library in 20 web searches. Every page fetch failed with a DNS error (qigonginstitute, nationwidechildrens, jfrh.tums, cochranelibrary), so every check below rests on search-result text, not full papers.\n\nCorrections needed:\n(1) Core-stability RCT. The journal is the Journal of Modern Rehabilitation (Shahrjerdi et al. 2019;13(1):113-122; 17 vs 17), not 'J Med Res'. Its results are now known: pain intensity (P=0.008), pain duration (P=0.021) and painkiller use (P=0.018) fell significantly. It is still unknown whether it used bridge or plank.\n(2) The luteal yoga routine's 'daily' frequency is not supported. eJIM gives only 20 min per session for at least 14 luteal days, and a secondary summary of the Tsai table says 3x/week.\n(3) Nationwide Children's cobra uses straight elbows. The bent-elbow version and the child's-pose rest are app adaptations. The supported-fish pillow version and the cobra '5 belly breaths' and lower-back warning are confirmed. The cat-cow doses (5-10 rounds, 2-3 breaths) were not seen.\n(4) NCT05709951 runs 4 days/week for 8 weeks, and cobra is in its functional arm. Its publication status is unverified.\n(5) The Kirmizigil 2020 published title is 'Effectiveness of functional exercises...'. Its components (pelvic motions, Kegels) were not seen, and the program includes Kegels, which conflicts with the app's no-Kegel default.\n(6) Vaziri's '10 stretches' was not seen. Pelvic/abdomen/groin stretching and treadmill come from the IRCT registry.\n(7) Tsai's 'lowest dropout' is shaky: the quoted CI (-0.20 to 0.02) crosses zero.\n(8) The Cochrane '~25 mm on a 100 mm VAS' is confirmed by the PubMed abstract snippet, so remove it from the unverified list.\n(9) Kannan: pain intensity and quality improved at 4 weeks, but present pain did not. Its PEDro score is 6/10, not 4.\n(10) NHS urgent-care wording is 'severe or worse than usual'. The HSE attributions, including the under-16 aspirin rule, were not seen; Northern Ireland's HealthWell supports the aspirin rule instead.\n\nConfirmed: Rakhshaee's design and results (its PEDro 4/10 was not seen), Shahr-jerdy's numbers and dose, Celenay's PMR timing, Tsai's effect sizes, Cochrane's SMD and dose pattern, and Kirmizigil's n=28, 3x/week for 8 weeks.\n\nUnverifiable: ACTRN12613000073707, NCT05340101, AAFP core strengthening, Hinge Health/FeminaPT, and every 'ok_during_bleeding' flag.",
+  "missing_points": [
+   "Cochrane reports that its included trials gave no adverse-event data, so exercise safety (including on bleeding days) is not established. Add this to the safety list and the ok_during_bleeding rationale.",
+   "Shahr-jerdy's control group also had a significant fall in pain duration (p<0.001), which weakens the duration claim. Note it in the evidence.",
+   "Kannan 2019 did not improve present pain at 4 weeks. Benefits for present pain, QoL and function were maintained to 7 months. Its PEDro score is 6/10, the best-quality trial in the set.",
+   "NCT05709951's functional arm includes cobra pose and bridging. This is another registered, unpublished protocol relevant to cobra.",
+   "The core-stability RCT dose (3x/week, 45-60 min, 8 weeks) differs from the app's 2x10-min routine, so the bridge and plank defaults are not trial-matched.",
+   "Kirmizigil's program includes Kegels, which conflicts with the app's default of excluding pelvic-floor strengthening. Say so explicitly when citing it for pelvic tilts.",
+   "The Nationwide Children's handout advises doing the poses after a walk or bath when the body is warm. This is a useful app tip.",
+   "The luteal-phase timing for yoga and PMR depends on the BBT shift. Celenay used the estimated ovulation date, not a confirmed BBT shift, so starting 'the day after the shift is confirmed' (often 3+ days after ovulation) is a later start than the trial. Label it as an adaptation.",
+   "The Tsai 2024 relaxation node and the Rakhshaee frequency both need the Table 1 full text (springeropen), which could not be fetched."
+  ]
+ }
+}
