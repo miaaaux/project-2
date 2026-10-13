@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "period-tracker",
+    "name": "Period Tracker",
     "slug": "period-tracker",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false
     },
     "android": {
       "adaptiveIcon": {
@@ -23,8 +23,21 @@
     },
     "plugins": [
       "expo-router",
-      "expo-sqlite",
-      "expo-secure-store"
-    ]
+      [
+        "expo-sqlite",
+        {
+          "useSQLCipher": true
+        }
+      ],
+      "expo-secure-store",
+      [
+        "expo-notifications",
+        {}
+      ]
+    ],
+    "scheme": "periodtracker",
+    "experiments": {
+      "typedRoutes": true
+    }
   }
 }
