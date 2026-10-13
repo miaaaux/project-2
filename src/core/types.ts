@@ -99,6 +99,8 @@ export interface DailyLog {
   flow?: Flow;
   /** The user tapped "my period started" on this day. Only this starts a cycle. */
   periodStartConfirmed?: boolean;
+  /** The user answered "no" to "did your period start?" for bleeding that began on this day. */
+  notPeriodStart?: boolean;
   /** Soaking a pad/tampon within 1-2 hours, or clots larger than about 2.5 cm. */
   flooding?: boolean;
 
@@ -209,6 +211,8 @@ export interface Settings {
     discreet: boolean;
   };
   sleepTargetHours: number;
+  /** Set when onboarding is finished. */
+  onboardedAt?: Instant;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
