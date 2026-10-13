@@ -28,6 +28,21 @@ function effectOf(c: ContextPeriod): 'not_applicable' | 'lock' {
   return Object.prototype.hasOwnProperty.call(CONTEXT_EFFECT, c.kind) ? CONTEXT_EFFECT[c.kind] : 'lock';
 }
 
+/** Section 10: contexts whose lock carries the reason method_not_supported_postpartum. */
+const POSTPARTUM_KINDS: Partial<Record<ContextKind, true>> = { postpartum: true, breastfeeding: true };
+
+/** Section 10: a postpartum or breastfeeding context covers this day. */
+export function isPostpartumOn(contexts: readonly ContextPeriod[] | undefined, date: ISODate): boolean {
+  return validContexts(contexts).some((c) => POSTPARTUM_KINDS[c.kind] === true && covers(c, date, date));
+}
+
+/** Section 10: the check-in for this cycle start reports a birth in the last 12 months or breastfeeding. */
+export function checkInReportsPostpartum(answers: readonly CycleContextAnswer[] | undefined, cycleStart: ISODate): boolean {
+  return (Array.isArray(answers) ? answers : []).some(
+    (a) => a && a.cycleStart === cycleStart && (a.birthInLast12Months === true || a.breastfeeding === true),
+  );
+}
+
 /** A13: hormonal contraception or pregnancy on this day. */
 export function isNotApplicableOn(contexts: readonly ContextPeriod[] | undefined, date: ISODate): boolean {
   return validContexts(contexts).some((c) => effectOf(c) === 'not_applicable' && covers(c, date, date));

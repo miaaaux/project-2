@@ -213,6 +213,8 @@ export interface Settings {
   sleepTargetHours: number;
   /** Set when onboarding is finished. */
   onboardedAt?: Instant;
+  /** Starts of unusually long cycles the user confirmed as real (not a forgotten period log). Stored by date, not index, so backfilling a period never shifts them. */
+  confirmedRealCycleStarts?: ISODate[];
 }
 
 export const DEFAULT_SETTINGS: Settings = {

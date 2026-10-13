@@ -7,7 +7,7 @@ import { compareDates, dateRange, type ISODate } from '../../core/date';
 import { useAppData } from '../../state/AppDataProvider';
 import { Body, Button, Card, Screen, Title } from '../../ui/components';
 import { monthTitle } from '../../ui/format';
-import { font, radius, space, useTheme } from '../../ui/theme';
+import { font, radius, useTheme } from '../../ui/theme';
 
 const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 

@@ -6,7 +6,7 @@
 // a floating-point threshold (the LENIENT history grid is integer rounding).
 
 import { addDays, compareDates, type ISODate } from '../date';
-import type { DailyLog, Settings, TempRoute, TempUnit, TemperatureReading } from '../types';
+import type { DailyLog, ExclusionReason, Settings, TempRoute, TempUnit, TemperatureReading } from '../types';
 import type { FertilityReason, ReadingKind, TemperatureRule } from './model';
 import { clockMinutes, isRecalled, validOffset } from './time';
 
@@ -25,6 +25,16 @@ const LENIENT_GRID: Record<TempUnit, { base: number; step: number }> = {
   F: { base: 3200, step: 9 },
 };
 const ROUTES: Record<TempRoute, true> = { oral: true, vaginal: true, rectal: true };
+/** Section 5: the reason codes a user bracket may carry. */
+const EXCLUSION_REASONS: Record<ExclusionReason, true> = {
+  fever_illness: true,
+  alcohol: true,
+  short_sleep: true,
+  off_time: true,
+  travel: true,
+  medication: true,
+  other: true,
+};
 
 function isRoute(r: unknown): r is TempRoute {
   return typeof r === 'string' && Object.prototype.hasOwnProperty.call(ROUTES, r);
@@ -45,6 +55,11 @@ export interface DayTemp {
   value: number | null;
   /** Measurement time (minutes after midnight) of a single reading. */
   minutes: number | null;
+  /**
+   * A7: SUSPECT only because the date has several readings. Such a day is still
+   * a VALID low (value = its maximum) for the A1(c)/A4 drop checks.
+   */
+  suspectOnlyAsHigher?: true;
   unit: TempUnit | null;
   route: TempRoute | null;
   thermometerId: string | null;
@@ -76,8 +91,26 @@ function isFever(r: TemperatureReading): boolean {
   return isUnit(r.unit) && hasIntegerValue(r) && r.value > PLAUSIBLE[r.unit].max;
 }
 
+function hasBracket(r: TemperatureReading): boolean {
+  return r.excluded !== undefined && r.excluded !== null;
+}
+
+/** Section 5: a bracket counts only with a known reason code. */
+function hasValidBracket(r: TemperatureReading): boolean {
+  const reason = hasBracket(r) && typeof r.excluded === 'object' ? (r.excluded as { reason?: unknown }).reason : undefined;
+  return typeof reason === 'string' && Object.prototype.hasOwnProperty.call(EXCLUSION_REASONS, reason);
+}
+
 function isExcludedReading(r: TemperatureReading): boolean {
-  return (r.excluded !== undefined && r.excluded !== null) || isFever(r);
+  return hasValidBracket(r) || isFever(r);
+}
+
+/**
+ * Section 5: "never allowed without a reason". Honouring such a bracket would
+ * drop a low and lower the coverline, so the reading is kept as a SUSPECT low.
+ */
+function hasInvalidBracket(r: TemperatureReading): boolean {
+  return hasBracket(r) && !hasValidBracket(r);
 }
 
 // --------------------------------------------------------------- A5: usual time
@@ -174,17 +207,21 @@ export function classifyTemperatureDay(ctx: ReadingDayContext): DayTemp {
     return { ...NO_READING, ...meta, kind: 'EXCLUDED', value: shown };
   }
   const value = Math.max(...usable.map((r) => r.value));
-  const suspect =
-    readings.length > 1 || // A7: several readings on one date never count as a higher reading
+  const flagged =
     usable.length !== readings.filter((r) => !isExcludedReading(r)).length ||
+    usable.some(hasInvalidBracket) ||
     isDayDisturbed(ctx.log) ||
     usable.some((r) => isReadingSuspect(r, ctx));
-  return {
+  // A7: several readings on one date never count as a higher reading.
+  const several = readings.length > 1;
+  const day: DayTemp = {
     ...meta,
-    kind: suspect ? 'SUSPECT' : 'VALID',
+    kind: flagged || several ? 'SUSPECT' : 'VALID',
     value,
     minutes: readings.length === 1 ? clockMinutes(first.measuredAt) : null,
   };
+  if (several && !flagged) day.suspectOnlyAsHigher = true;
+  return day;
 }
 
 // ------------------------------------------------------------ A5/A8: blocking
@@ -251,6 +288,8 @@ export interface ConfirmedRise {
   completeDay: number;
   /** The single dip excused by Exception 2. */
   dipDay: number | null;
+  /** A5: twice the median measurement time of the 6 lows (kept integer). */
+  lowsMedianMinutesTimes2: number;
 }
 
 export type StrictResult =
@@ -300,8 +339,18 @@ export function collectLows(days: TempDays, f: number): Lows | null {
 }
 
 /** A5: a candidate or higher reading more than 60 min from the median time of its 6 lows is SUSPECT. */
-function matchesLowsTime(day: DayTemp, lows: Lows): boolean {
-  return day.minutes !== null && Math.abs(2 * day.minutes - lows.medianMinutesTimes2) <= 2 * OFF_TIME_MINUTES;
+function matchesLowsTime(day: DayTemp, medianMinutesTimes2: number): boolean {
+  return day.minutes !== null && Math.abs(2 * day.minutes - medianMinutesTimes2) <= 2 * OFF_TIME_MINUTES;
+}
+
+/** A(d) of section 6.5 with the A5 lows-time rule: VALID, on time for its lows and `threshold` over the coverline. */
+function isHigherReading(day: DayTemp, coverline: number, medianMinutesTimes2: number, threshold: number): boolean {
+  return (
+    day.kind === 'VALID' &&
+    day.value !== null &&
+    matchesLowsTime(day, medianMinutesTimes2) &&
+    day.value - coverline >= threshold
+  );
 }
 
 /** Section 6.4-6.8: one FHM candidate f, judged with the data of cycle days 1..E. */
@@ -309,30 +358,35 @@ function evaluateCandidate(days: TempDays, f: number, E: number, firstCycle: boo
   const candidate = dayAt(days, f);
   if (candidate.kind !== 'VALID' || candidate.value === null) return { type: 'not_candidate' };
   const lows = collectLows(days, f);
-  if (lows === null || !matchesLowsTime(candidate, lows)) return { type: 'not_candidate' };
+  if (lows === null || !matchesLowsTime(candidate, lows.medianMinutesTimes2)) return { type: 'not_candidate' };
   const cl = lows.coverline;
+  const median2 = lows.medianMinutesTimes2;
   if (candidate.value - cl < ABOVE[unit]) return { type: 'not_candidate' };
 
-  const isHigher = (x: number, threshold: number) => {
-    const day = dayAt(days, x);
-    return day.kind === 'VALID' && day.value !== null && matchesLowsTime(day, lows) && day.value - cl >= threshold;
-  };
-  const A = (x: number) => isHigher(x, ABOVE[unit]);
-  const R = (x: number) => isHigher(x, RISE[unit]);
+  const A = (x: number) => isHigherReading(dayAt(days, x), cl, median2, ABOVE[unit]);
+  const R = (x: number) => isHigherReading(dayAt(days, x), cl, median2, RISE[unit]);
   const pending: CandidateOutcome = { type: 'pending', fhm: f, coverline: cl };
+  const confirmed = (rule: TemperatureRule, completeDay: number, dipDay: number | null): ConfirmedRise => ({
+    fhm: f,
+    coverline: cl,
+    rule,
+    completeDay,
+    dipDay,
+    lowsMedianMinutesTimes2: median2,
+  });
 
   if (f + 2 > E) return pending;
   const b = A(f + 1);
   const c = A(f + 2);
   let rise: ConfirmedRise | null = null;
   if (b && c && R(f + 2)) {
-    rise = { fhm: f, coverline: cl, rule: 'regular', completeDay: f + 2, dipDay: null };
+    rise = confirmed('regular', f + 2, null);
   } else if (b || c) {
     if (f + 3 > E) return pending;
     if (b && c) {
-      if (A(f + 3)) rise = { fhm: f, coverline: cl, rule: 'exception1', completeDay: f + 3, dipDay: null };
+      if (A(f + 3)) rise = confirmed('exception1', f + 3, null);
     } else if (R(f + 3)) {
-      rise = { fhm: f, coverline: cl, rule: 'exception2', completeDay: f + 3, dipDay: b ? f + 2 : f + 1 };
+      rise = confirmed('exception2', f + 3, b ? f + 2 : f + 1);
     }
   }
   if (rise === null) return { type: 'failed', fhm: f };
@@ -366,14 +420,19 @@ export function evaluateStrictRise(
   return { status: 'NONE' };
 }
 
-/** A(d) without the lows-time check: VALID and at least ABOVE over the coverline (sections 8, A1, A4). */
-export function isValidAbove(day: DayTemp, coverline: number, unit: TempUnit): boolean {
-  return day.kind === 'VALID' && day.value !== null && day.value - coverline >= ABOVE[unit];
+/** A(d) for a confirmed rise (A3.3, section 8.3): VALID, on time for the rise's 6 lows (A5) and at least ABOVE over its coverline. */
+export function isAboveRise(day: DayTemp, rise: ConfirmedRise, unit: TempUnit): boolean {
+  return isHigherReading(day, rise.coverline, rise.lowsMedianMinutesTimes2, ABOVE[unit]);
 }
 
-/** A1(c), A4: a VALID reading on or below the coverline. */
+/** A1(c), A4: a day that counts as a VALID low. A7 makes a multi-reading day SUSPECT only as a higher reading. */
+export function isUsableAsLow(day: DayTemp): boolean {
+  return day.value !== null && (day.kind === 'VALID' || day.suspectOnlyAsHigher === true);
+}
+
+/** A1(c), A4: a VALID low on or below the coverline (a multi-reading day by its maximum). */
 export function isValidLow(day: DayTemp, coverline: number): boolean {
-  return day.kind === 'VALID' && day.value !== null && day.value <= coverline;
+  return isUsableAsLow(day) && (day.value as number) <= coverline;
 }
 
 // ------------------------------------------------ section 6: LENIENT history

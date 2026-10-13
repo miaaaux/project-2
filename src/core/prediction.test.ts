@@ -4,8 +4,10 @@ import {
   calendarFertileWindow,
   classifyCycles,
   isSuspectedMissedLog,
+  predictionSnapshot,
   predictNextPeriod,
   regularityLimit,
+  scorePredictions,
   type Prediction,
   type PredictionInput,
   type RiseInfo,
@@ -60,6 +62,7 @@ describe('predictNextPeriod: no history', () => {
       eligibleLengths: [],
       excludedCycles: [],
       askAboutCycles: [],
+      suspectedMissedLogCycles: [],
     });
   });
 
@@ -108,6 +111,15 @@ describe('predictNextPeriod: early data (1-2 cycles)', () => {
   test('short history shrinks toward the onboarding answer', () => {
     const p = predict(history('2026-08-01', [36]), { settings: settings({ typicalCycleLength: 30 }) });
     expect(offsets(p)).toEqual({ center: 33, lo: 29, hi: 37 });
+  });
+
+  test.each([
+    [[45], { center: 37, lo: 33, hi: 45 }],
+    [[40, 42], { center: 37, lo: 33, hi: 42 }],
+    [[20], { center: 24, lo: 20, hi: 28 }],
+  ])('the range always covers the observed cycles (%j)', (lengths, expected) => {
+    // Shrinking toward the prior moves the centre, but a period exactly as long as last time is never "late".
+    expect(offsets(predict(history('2026-01-05', lengths)))).toEqual(expected);
   });
 
   test('a very wide early range never starts before day 15 of the current cycle', () => {
@@ -178,6 +190,7 @@ describe('predictNextPeriod: suspected missed logs', () => {
       { index: 6, reason: 'open' },
     ]);
     expect(p.askAboutCycles).toEqual([3]);
+    expect(p.suspectedMissedLogCycles).toEqual([3]);
     expect(p.eligibleLengths).toEqual([29, 29, 29, 29, 29]);
     expect(p.confidence).toBe('building');
     expect(offsets(p)).toEqual({ center: 29, lo: 27, hi: 31 });
@@ -187,6 +200,7 @@ describe('predictNextPeriod: suspected missed logs', () => {
     const p = predict(missed, { confirmedRealCycles: [3] });
     expect(p.excludedCycles).toEqual([{ index: 6, reason: 'open' }]);
     expect(p.askAboutCycles).toEqual([]);
+    expect(p.suspectedMissedLogCycles).toEqual([]);
     expect(p.eligibleLengths).toEqual([29, 29, 29, 58, 29, 29]);
     expect(offsets(p)).toEqual({ center: 29, lo: 27, hi: 58 });
     expect(p.regular).toBe(false);
@@ -230,6 +244,8 @@ describe('predictNextPeriod: implausible lengths', () => {
     ]);
     expect(p.askAboutCycles).toEqual([3]);
     expect(p.eligibleLengths).toEqual([28, 28, 28, 28]);
+    // 95 days is about 3 x 28, so it is also listed as a suspected missed log (for the red flags).
+    expect(p.suspectedMissedLogCycles).toEqual([3]);
   });
 
   test('15 and 90 days are plausible; 14 and 91 are not, even when confirmed', () => {
@@ -458,8 +474,46 @@ describe('classifyCycles', () => {
         { index: 3, reason: 'open' },
       ],
       askAbout: [2],
+      suspectedMissedLogs: [2],
     });
-    expect(classifyCycles(cycles, [], 28, [2])).toEqual({ excluded: [{ index: 3, reason: 'open' }], askAbout: [] });
+    expect(classifyCycles(cycles, [], 28, [2])).toEqual({
+      excluded: [{ index: 3, reason: 'open' }],
+      askAbout: [],
+      suspectedMissedLogs: [],
+    });
+  });
+});
+
+describe('prediction accuracy', () => {
+  test('a snapshot keeps what the prediction said; nothing without a prediction', () => {
+    const cycles = history('2026-01-05', [28, 29, 27, 28, 30, 28]);
+    const p = predict(cycles);
+    expect(predictionSnapshot(p)).toEqual({ cycleStart: '2026-06-24', basis: 'calendar', center: p.center, lo: p.lo, hi: p.hi });
+    expect(predictionSnapshot(predict([]))).toBeNull();
+  });
+
+  test('each closed cycle is scored against its actual start', () => {
+    // Snapshot taken while 2026-06-24 was the open cycle: range Jul 20..Jul 24, centre Jul 22.
+    const before = history('2026-01-05', [28, 29, 27, 28, 30, 28]);
+    const snapshot = predictionSnapshot(predict(before));
+    if (!snapshot) throw new Error('no snapshot');
+
+    const onTime = history('2026-01-05', [28, 29, 27, 28, 30, 28, 29]);
+    expect(scorePredictions([snapshot], onTime)).toEqual([
+      { cycleStart: '2026-06-24', basis: 'calendar', actualStart: '2026-07-23', errorDays: 1, inRange: true },
+    ]);
+    const late = history('2026-01-05', [28, 29, 27, 28, 30, 28, 33]);
+    expect(scorePredictions([snapshot], late)).toMatchObject([{ errorDays: 5, inRange: false }]);
+    const early = history('2026-01-05', [28, 29, 27, 28, 30, 28, 25]);
+    expect(scorePredictions([snapshot], early)).toMatchObject([{ errorDays: -3, inRange: false }]);
+  });
+
+  test('the open cycle, and a start that no longer exists, are not scored', () => {
+    const cycles = history('2026-01-05', [28, 29, 27, 28, 30, 28]);
+    const snapshot = predictionSnapshot(predict(cycles));
+    if (!snapshot) throw new Error('no snapshot');
+    expect(scorePredictions([snapshot], cycles)).toEqual([]);
+    expect(scorePredictions([{ ...snapshot, cycleStart: '2026-06-25' }], history('2026-01-05', [28, 29, 27, 28, 30, 28, 29]))).toEqual([]);
   });
 });
 

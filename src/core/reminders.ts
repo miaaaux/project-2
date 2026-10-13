@@ -55,14 +55,15 @@ const SUGAR_PAST_DUE_MIN_DAYS_TO_LO = 5;
 /** Two reminders of one type must fire at least this many days apart (guards against edited cycle starts). */
 const RESEND_GUARD_DAYS: Record<ReminderType, number> = { prep: 10, sugar: 18 };
 
-const PAUSING_CONTEXTS: ContextKind[] = ['pregnancy', 'postpartum', 'breastfeeding', 'hormonal_contraception'];
+/** SPEC §6. Breastfeeding alone does not pause them: once periods return, the reminders are useful again. */
+const PAUSING_CONTEXTS: ContextKind[] = ['pregnancy', 'postpartum', 'hormonal_contraception'];
 const MINUTES_PER_DAY = 24 * 60;
 
 export function reminderKey(type: ReminderType, cycleStart: ISODate): string {
   return `${type}:${cycleStart}`;
 }
 
-/** Reminders pause during pregnancy, postpartum, breastfeeding and hormonal contraception. */
+/** Reminders pause during pregnancy, postpartum and hormonal contraception. */
 export function remindersPaused(contexts: ContextPeriod[], today: ISODate): boolean {
   return contexts.some(
     (ctx) =>

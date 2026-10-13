@@ -35,7 +35,7 @@ export default function CheckIn() {
 
   return (
     <Screen>
-      <Body>For the cycle that started {shortDate(cycleStart)}. Answering "yes" to any question pauses the not-fertile labels for this cycle, because the method does not cover these situations.</Body>
+      <Body>For the cycle that started {shortDate(cycleStart)}. Answering “yes” to any question pauses the not-fertile labels for this cycle, because the method does not cover these situations.</Body>
       {CONTEXT_QUESTIONS.map((q) => (
         <Section key={q.key} title={q.text}>
           <ChipGroup

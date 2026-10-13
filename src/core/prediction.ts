@@ -44,6 +44,11 @@ export interface Prediction {
   excludedCycles: ExcludedCycle[];
   /** Cycles of at least 1.5x the usual length that the user has not confirmed: "Did you miss logging a period?" */
   askAboutCycles: number[];
+  /**
+   * Unconfirmed cycles of about 2x or 3x the usual length, whatever their length: a cycle over 90 days is
+   * listed here too, although `excludedCycles` gives it as 'implausible_length'.
+   */
+  suspectedMissedLogCycles: number[];
   /** The onboarding answer, or 28 when the user gave none (or an unusable one). */
   priorLength: number;
   priorFromUser: boolean;
@@ -146,6 +151,7 @@ function referenceLength(cycle: Cycle, usable: (Cycle & { length: number })[], p
 export interface CycleClassification {
   excluded: ExcludedCycle[];
   askAbout: number[];
+  suspectedMissedLogs: number[];
 }
 
 /**
@@ -163,6 +169,7 @@ export function classifyCycles(
   const usable = sorted.filter(isCompleted).filter((c) => isPlausibleLength(c.length) && !overlapsContext(c, contexts));
   const excluded: ExcludedCycle[] = [];
   const askAbout: number[] = [];
+  const suspectedMissedLogs: number[] = [];
 
   for (const c of sorted) {
     if (!isCompleted(c)) {
@@ -176,14 +183,16 @@ export function classifyCycles(
     }
     const usual = referenceLength(c, usable, priorLength);
     const unconfirmedLong = c.length >= ASK_FACTOR * usual && !confirmed.has(c.index);
+    const suspected = unconfirmedLong && isSuspectedMissedLog(c.length, usual);
     if (unconfirmedLong) askAbout.push(c.index);
+    if (suspected) suspectedMissedLogs.push(c.index);
     if (!isPlausibleLength(c.length)) {
       excluded.push({ index: c.index, reason: 'implausible_length' });
-    } else if (unconfirmedLong && isSuspectedMissedLog(c.length, usual)) {
+    } else if (suspected) {
       excluded.push({ index: c.index, reason: 'suspected_missed_log' });
     }
   }
-  return { excluded, askAbout };
+  return { excluded, askAbout, suspectedMissedLogs };
 }
 
 /** Completed cycles that are not excluded, oldest first. */
@@ -211,10 +220,16 @@ export function calendarOffsets(lengths: number[], prior: number): Offsets & { c
   if (n === 0) {
     result = { center: prior, lo: prior - PRIOR_RANGE.before, hi: prior + PRIOR_RANGE.after, confidence: 'estimate' };
   } else if (n <= 2) {
-    // Shrink toward the prior: one or two cycles say little on their own.
+    // Shrink the centre toward the prior: one or two cycles say little on their own. The range
+    // still covers the user's own cycles, or a period exactly as long as last time would be "late".
     const center = Math.round(mean([...lengths, prior]));
     const spread = Math.max(EARLY_MIN_SPREAD, spreadOf(lengths));
-    result = { center, lo: center - spread, hi: center + spread, confidence: 'early' };
+    result = {
+      center,
+      lo: Math.min(Math.min(...lengths), center - spread),
+      hi: Math.max(Math.max(...lengths), center + spread),
+      confidence: 'early',
+    };
   } else {
     const center = Math.round(median(lengths));
     result = {
@@ -266,7 +281,7 @@ function statusOn(today: ISODate, lo: ISODate, hi: ISODate): { status: Predictio
 export function predictNextPeriod(input: PredictionInput): Prediction {
   const { cycles, contexts, settings, rises, confirmedRealCycles = [], today } = input;
   const prior = priorCycleLength(settings);
-  const { excluded, askAbout } = classifyCycles(cycles, contexts, prior.length, confirmedRealCycles);
+  const { excluded, askAbout, suspectedMissedLogs } = classifyCycles(cycles, contexts, prior.length, confirmedRealCycles);
   const eligible = eligibleCycles(cycles, excluded);
   const lengths = eligible.slice(-WINDOW).map((c) => c.length);
   const current = cycles.find((c) => c.end === null);
@@ -275,6 +290,7 @@ export function predictNextPeriod(input: PredictionInput): Prediction {
     eligibleLengths: lengths,
     excludedCycles: excluded,
     askAboutCycles: askAbout,
+    suspectedMissedLogCycles: suspectedMissedLogs,
     priorLength: prior.length,
     priorFromUser: prior.fromUser,
   };
@@ -324,6 +340,58 @@ export function predictNextPeriod(input: PredictionInput): Prediction {
     regular,
     ...statusOn(today, lo, hi),
   };
+}
+
+// ------------------------------------------------------------ accuracy
+//
+// SPEC §3: store a snapshot of each prediction and compare it with the actual
+// start. The snapshots themselves are stored by the data layer; these helpers
+// say what to store and how to score it once the next period is confirmed.
+
+/** What a prediction said about the next period start. */
+export interface PredictionSnapshot {
+  cycleStart: ISODate;
+  basis: PredictionBasis;
+  center: ISODate;
+  lo: ISODate;
+  hi: ISODate;
+}
+
+export interface PredictionScore {
+  cycleStart: ISODate;
+  basis: PredictionBasis;
+  /** The confirmed start of the next period. */
+  actualStart: ISODate;
+  /** actualStart - center in days: positive when the period came later than predicted. */
+  errorDays: number;
+  inRange: boolean;
+}
+
+/** The snapshot to store for a prediction, or null when there is nothing to predict. */
+export function predictionSnapshot(p: Prediction): PredictionSnapshot | null {
+  if (p.cycleStart === null || p.center === null || p.lo === null || p.hi === null) return null;
+  return { cycleStart: p.cycleStart, basis: p.basis, center: p.center, lo: p.lo, hi: p.hi };
+}
+
+/**
+ * Scores each snapshot whose cycle has closed. Snapshots for the open cycle, or
+ * for a start the user has since removed, are skipped.
+ */
+export function scorePredictions(snapshots: PredictionSnapshot[], cycles: Cycle[]): PredictionScore[] {
+  return snapshots.flatMap((s) => {
+    const cycle = cycles.find((c) => c.start === s.cycleStart);
+    if (!cycle || cycle.end === null) return [];
+    const actualStart = addDays(cycle.end, 1);
+    return [
+      {
+        cycleStart: s.cycleStart,
+        basis: s.basis,
+        actualStart,
+        errorDays: diffDays(actualStart, s.center),
+        inRange: compareDates(actualStart, s.lo) >= 0 && compareDates(actualStart, s.hi) <= 0,
+      },
+    ];
+  });
 }
 
 // ------------------------------------------------------ fertile window

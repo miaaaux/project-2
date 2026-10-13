@@ -5,7 +5,9 @@ import {
   deleteLog,
   exportAll,
   loadAppData,
+  loadAlertAcks,
   loadShownStatuses,
+  recordAlertAck,
   recordShownStatus,
   saveContextPeriod,
   saveLog,
@@ -66,11 +68,28 @@ test('settings and contexts persist', async () => {
   expect(data.contexts).toEqual([{ id: 'c1', kind: 'breastfeeding', start: '2026-01-01' }]);
 });
 
-test('a shown status is recorded once, keeping the first time it was shown', async () => {
+test('a shown status keeps the latest time it was shown', async () => {
   const db = await freshDb();
   await recordShownStatus(db, { date: '2026-10-12', status: 'infertile_post_ovulatory', shownAt: NOW });
   await recordShownStatus(db, { date: '2026-10-12', status: 'infertile_post_ovulatory', shownAt: '2026-10-13T20:00:00.000Z' });
-  expect(await loadShownStatuses(db)).toEqual([{ date: '2026-10-12', status: 'infertile_post_ovulatory', shownAt: NOW }]);
+  expect(await loadShownStatuses(db)).toEqual([
+    { date: '2026-10-12', status: 'infertile_post_ovulatory', shownAt: '2026-10-13T20:00:00.000Z' },
+  ]);
+});
+
+test('alert acknowledgements persist, one per date', async () => {
+  const db = await freshDb();
+  await recordAlertAck(db, { date: '2026-10-12', ackAt: NOW });
+  await recordAlertAck(db, { date: '2026-10-12', ackAt: '2026-10-14T08:00:00.000Z' });
+  expect(await loadAlertAcks(db)).toEqual([{ date: '2026-10-12', ackAt: '2026-10-14T08:00:00.000Z' }]);
+});
+
+test('a version-1 database is upgraded to add the acknowledgements table', async () => {
+  const db = new FakeDb();
+  db.userVersion = 1;
+  await migrate(db);
+  expect(db.userVersion).toBe(SCHEMA_VERSION);
+  expect(db.tables.has('alert_acks')).toBe(true);
 });
 
 test('export contains everything and delete removes everything', async () => {

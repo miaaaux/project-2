@@ -10,7 +10,7 @@ import type { SQLiteDatabase } from 'expo-sqlite';
 
 import { localDateOf, type ISODate } from '../core/date';
 import { derive, type DerivedState } from '../core/derive';
-import { newlyFertileDays, type FertilityStatus } from '../core/fertility';
+import type { DayFertility } from '../core/fertility';
 import { planReminderSync, type StoredReminder } from '../core/reminders';
 import type {
   AppData,
@@ -23,6 +23,7 @@ import type {
 import { destroyAppDatabase, openAppDatabase } from '../data/db';
 import * as repo from '../data/repository';
 import { applyReminderPlan, configureNotifications, markDelivered } from '../notifications/reminders';
+import { datesNeedingAlert, shouldRecordShown } from './editSafety';
 
 export interface Clock {
   today: ISODate;
@@ -58,19 +59,10 @@ interface AppDataValue {
   deleteContext(id: string): Promise<void>;
   saveCycleAnswer(a: Omit<CycleContextAnswer, 'answeredAt'>): Promise<void>;
   updateSettings(patch: Partial<Settings>): Promise<void>;
-  markFertilityShown(date: ISODate, status: string): Promise<void>;
+  /** Call whenever a fertility label is on screen; only not-fertile labels are remembered (A17). */
+  markFertilityShown(day: DayFertility): Promise<void>;
   exportData(): Promise<repo.ExportFile>;
   deleteAllData(): Promise<void>;
-}
-
-/** The most recent status shown for each date. ISO instants compare correctly as strings. */
-function latestShownPerDate(shown: repo.ShownStatus[]): { date: ISODate; status: FertilityStatus }[] {
-  const latest = new Map<ISODate, repo.ShownStatus>();
-  for (const s of shown) {
-    const prev = latest.get(s.date);
-    if (!prev || s.shownAt > prev.shownAt) latest.set(s.date, s);
-  }
-  return [...latest.values()].map((s) => ({ date: s.date, status: s.status as FertilityStatus }));
 }
 
 const EMPTY: AppData = { logs: {}, exercise: [], contexts: [], cycleContextAnswers: [], settings: repo.withSettingsDefaults(null) };
@@ -92,7 +84,9 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   const [editAlert, setEditAlert] = useState<EditAlert | null>(null);
   // Always the latest data, for actions that derive a new value from it.
   const dataRef = useRef(data);
-  dataRef.current = data;
+  useEffect(() => {
+    dataRef.current = data;
+  }, [data]);
 
   // Open the database once.
   useEffect(() => {
@@ -125,9 +119,11 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  // derive() does not depend on the time of day, so it re-runs only when the data, the date or the time zone changes.
   const derived = useMemo(
     () => (ready ? derive(data, { today: clock.today, now: clock.now, deviceUtcOffsetMinutes: clock.deviceUtcOffsetMinutes }) : null),
-    [ready, data, clock.today, clock.now, clock.deviceUtcOffsetMinutes],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [ready, data, clock.today, clock.deviceUtcOffsetMinutes],
   );
 
   // Re-sync reminders whenever the derived reminders change.
@@ -149,7 +145,8 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     const db = dbRef.current;
     if (!db || !derived) return;
     (async () => {
-      const dates = newlyFertileDays(latestShownPerDate(await repo.loadShownStatuses(db)), derived.fertility.days);
+      const [shown, acks] = await Promise.all([repo.loadShownStatuses(db), repo.loadAlertAcks(db)]);
+      const dates = datesNeedingAlert(shown, acks, derived.fertility.days);
       if (dates.length === 0) return;
       const unprotectedDates = dates.filter((d) => data.logs[d]?.intercourse === 'unprotected');
       setEditAlert({ dates, unprotectedDates });
@@ -163,7 +160,17 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const markFertilityShown = useCallback(
-    (date: ISODate, status: string) => withDb((db) => repo.recordShownStatus(db, { date, status, shownAt: readClock().instant })),
+    (day: DayFertility) =>
+      shouldRecordShown(day)
+        ? withDb((db) =>
+            repo.recordShownStatus(db, {
+              date: day.date,
+              status: day.status,
+              eveningTransition: day.eveningTransition === true || undefined,
+              shownAt: readClock().instant,
+            }),
+          )
+        : Promise.resolve(),
     [withDb],
   );
 
@@ -178,10 +185,10 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       const alert = editAlert;
       setEditAlert(null);
       if (!alert) return;
-      // The user has now seen these days as fertile; record that so the alert does not repeat.
+      // Acknowledged: the alert does not repeat unless a day is shown as not fertile again later.
       void withDb(async (db) => {
-        const shownAt = readClock().instant;
-        for (const date of alert.dates) await repo.recordShownStatus(db, { date, status: 'fertile', shownAt });
+        const ackAt = readClock().instant;
+        for (const date of alert.dates) await repo.recordAlertAck(db, { date, ackAt });
       }).catch(() => undefined);
     },
     saveLog: (log) =>

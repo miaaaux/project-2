@@ -89,10 +89,12 @@ export function saveReminderState<T extends { key: string }>(db: SqlDatabase, r:
   return putDoc(db, 'reminders', r.key, r, now);
 }
 
-/** A fertility status as it was shown to the user (amendment A17: edits that turn a shown infertile day fertile raise an alert). */
+/** A not-fertile status as it was shown to the user (amendment A17). */
 export interface ShownStatus {
   date: ISODate;
   status: string;
+  eveningTransition?: boolean;
+  /** The latest time this status was shown for this date. */
   shownAt: Instant;
 }
 
@@ -100,11 +102,24 @@ export async function loadShownStatuses(db: SqlDatabase): Promise<ShownStatus[]>
   return (await allDocs<ShownStatus>(db, 'shown_statuses')).map((r) => r.doc);
 }
 
-/** Keeps the first time each date was shown with a given status. */
+/** Records (or refreshes the time of) a status shown for a date. */
 export async function recordShownStatus(db: SqlDatabase, s: ShownStatus): Promise<void> {
-  const id = `${s.date}:${s.status}`;
-  if (await getDoc(db, 'shown_statuses', id)) return;
+  const id = `${s.date}:${s.status}:${s.eveningTransition ? 'evening' : ''}`;
   await putDoc(db, 'shown_statuses', id, s, s.shownAt);
+}
+
+/** The user acknowledged that a day previously shown as not fertile is now fertile. */
+export interface AlertAck {
+  date: ISODate;
+  ackAt: Instant;
+}
+
+export async function loadAlertAcks(db: SqlDatabase): Promise<AlertAck[]> {
+  return (await allDocs<AlertAck>(db, 'alert_acks')).map((r) => r.doc);
+}
+
+export async function recordAlertAck(db: SqlDatabase, a: AlertAck): Promise<void> {
+  await putDoc(db, 'alert_acks', a.date, a, a.ackAt);
 }
 
 // --------------------------------------------------------- export / delete

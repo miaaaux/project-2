@@ -22,11 +22,13 @@ export default function Insights() {
   const todayLog = data.logs[today];
   const cycle = derived.currentCycle;
   const rise = cycle ? derived.fertility.cycles.find((c) => c.cycleIndex === cycle.index)?.rise : null;
+  // Luteal: after a confirmed temperature rise, or (without temperature charting) from about 14 days before the predicted period.
+  const lo = derived.prediction.lo;
   const phase = !cycle
     ? 'unknown'
     : isInPeriod(cycle, today)
       ? 'menstrual'
-      : rise && compareDates(rise.fhmDate, today) <= 0
+      : (rise && compareDates(rise.fhmDate, today) <= 0) || (!rise && lo && compareDates(today, lo) >= -14)
         ? 'luteal'
         : 'follicular';
   const gentleOnly = (todayLog?.cramps ?? 0) >= 6 || todayLog?.flow === 'heavy' || !!todayLog?.flooding;

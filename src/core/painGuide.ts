@@ -25,7 +25,7 @@ export interface HabitStatus {
   state: 'on_track' | 'off_track' | 'not_enough_logs';
   /** Share of logged days (magnesium, sugar), exercise days per week, or mean hours (sleep); null without enough logs. */
   value: number | null;
-  /** Share of the window's days with this habit logged. */
+  /** Share of the window's days with this habit logged (for exercise: a daily log or a session). */
   coverage: number;
   target: number;
   window: DateWindow;
@@ -136,20 +136,27 @@ function dailyHabitStatus(
 }
 
 /**
- * Exercise sessions are events, so a day without one is not "unlogged". The
- * habit is unknown only when nothing at all was logged in the window.
+ * Exercise sessions are events with no "none" entry, so a day counts as logged
+ * when it has a daily log or a session. Unlogged days can only hide exercise:
+ * enough exercise days are on track whatever the coverage, but too few are
+ * "off track" only when at least 60% of the days were logged.
  */
 function exerciseStatus(window: DateWindow, input: HabitInput): HabitStatus {
   const days = dateRange(window.start, window.end);
   const sessions = input.exercise.filter((s) => inWindow(s.date, window));
-  const anythingLogged = sessions.length > 0 || days.some((d) => input.logs[d] !== undefined);
+  const sessionDays = new Set(sessions.map((s) => s.date));
+  const loggedDays = days.filter((d) => input.logs[d] !== undefined || sessionDays.has(d)).length;
+  const coverage = days.length === 0 ? 0 : loggedDays / days.length;
   const target = EXERCISE_DAYS_PER_WEEK_TARGET;
-  if (!anythingLogged || days.length === 0) {
-    return { habit: 'exercise', state: 'not_enough_logs', value: null, coverage: 0, target, window };
-  }
   const exerciseDays = new Set(sessions.filter((s) => s.minutes >= MIN_EXERCISE_MINUTES).map((s) => s.date)).size;
-  const value = (exerciseDays * 7) / days.length;
-  return { habit: 'exercise', state: value >= target ? 'on_track' : 'off_track', value, coverage: 1, target, window };
+  const value = days.length === 0 ? 0 : (exerciseDays * 7) / days.length;
+  if (loggedDays > 0 && value >= target) {
+    return { habit: 'exercise', state: 'on_track', value, coverage, target, window };
+  }
+  if (loggedDays === 0 || coverage < MIN_COVERAGE) {
+    return { habit: 'exercise', state: 'not_enough_logs', value: null, coverage, target, window };
+  }
+  return { habit: 'exercise', state: 'off_track', value, coverage, target, window };
 }
 
 function habitStatuses(windows: Record<HabitKey, DateWindow>, input: HabitInput): HabitStatus[] {

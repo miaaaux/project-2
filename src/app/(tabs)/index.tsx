@@ -20,13 +20,13 @@ import { HabitList } from '../../ui/HabitList';
 import { space } from '../../ui/theme';
 
 export default function Today() {
-  const { data, derived, clock, saveLog, markFertilityShown } = useAppData();
+  const { data, derived, clock, saveLog, markFertilityShown, updateSettings } = useAppData();
   const today = clock.today;
   const fertility = derived?.fertilityVisible ? derived.todayFertility : null;
 
   useEffect(() => {
-    if (fertility) void markFertilityShown(today, fertility.status).catch(() => undefined);
-  }, [fertility, today, markFertilityShown]);
+    if (fertility) void markFertilityShown(fertility).catch(() => undefined);
+  }, [fertility, markFertilityShown]);
 
   if (!derived) return null;
   const { currentCycle, prediction, redFlags, prepCard, reminders } = derived;
@@ -54,6 +54,22 @@ export default function Today() {
           <Button kind="secondary" label="No, it was bleeding between periods" onPress={() => saveLog({ ...data.logs[d], notPeriodStart: true })} />
         </Card>
       ))}
+
+      {prediction.askAboutCycles.map((i) => {
+        const c = derived.cycles[i];
+        if (!c || !c.length) return null;
+        return (
+          <Card key={`ask${c.start}`}>
+            <Body>Your cycle that started {shortDate(c.start)} lasted {c.length} days. Did you forget to log a period in between?</Body>
+            <Button kind="secondary" label="Yes, I'll add it in the calendar" onPress={() => router.push('/calendar')} />
+            <Button
+              kind="secondary"
+              label="No, it really was that long"
+              onPress={() => void updateSettings({ confirmedRealCycleStarts: [...(data.settings.confirmedRealCycleStarts ?? []), c.start] })}
+            />
+          </Card>
+        );
+      })}
 
       {needsCheckin ? (
         <Card tone="warning">

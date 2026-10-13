@@ -224,7 +224,7 @@ export default function LogScreen() {
         <Body>Color</Body>
         <ChipGroup label="Color" options={COLOR} value={m?.color} onChange={(v) => setMucus({ color: v })} />
         <ToggleRow label="I'm unsure" value={m?.unsure} onChange={(v) => setMucus({ unsure: v })} hint="Unsure days are counted as possibly fertile." />
-        <Body muted small>Couldn't assess it because of:</Body>
+        <Body muted small>Couldn’t assess it because of:</Body>
         <ChipGroup label="Not assessable" options={NOT_ASSESSABLE} value={m?.notAssessable} onChange={(v) => setMucus({ notAssessable: v })} />
         <ToggleRow
           label="This is the most fertile observation of my day"

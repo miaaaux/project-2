@@ -263,3 +263,12 @@ Safety rules:
 1. **Distribution.** Is this for personal use, or will it be published in app stores? Publishing infertile statuses in the US or EU needs medical-device clearance, and Apple can reject it under 1.4.1. If you publish without clearance, contraception mode would have to become a charting aid that never labels days infertile.
 2. **License** for the app's code. It must not copy code from `sympto` or `drip` (AGPL/GPL); the rules here were implemented independently.
 3. **Method check.** Before relying on contraception mode, compare `docs/fertility-rules.md` with the Sensiplan handbook ("Natural & Safe"), ideally with a certified teacher.
+4. **No-period red flag.** Besides pregnancy and breastfeeding (the spec), postpartum and hormonal contraception also silence the "no period for 90 days" flag, because implants and hormonal coils often stop periods. This is kept as the default; say if you want the stricter reading.
+
+## 12. Known limitations (v1)
+
+- The resend guard (no second reminder of the same type within 10 or 18 days) can drop a sugar reminder after an unusually short cycle.
+- Prediction accuracy can be scored (`predictionSnapshot`, `scorePredictions`), but snapshots are not yet stored.
+- The calendar's period shading uses the cycle module's period run (at most 2 trailing spotting days). The fertility engine uses the method's own definition (every contiguous bleeding day), so the two can differ by a spotting day or two.
+- The fertility engine only shows infertile labels when contraception mode is on and acknowledged. It enforces this itself, not only the UI.
+- No on-device testing has been done yet: the app is typechecked, linted, unit- and render-tested, and bundles for iOS and Android, but has not been run on a phone or simulator.

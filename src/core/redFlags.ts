@@ -2,12 +2,14 @@
 // is shown as "worth talking to a doctor", never as "try harder".
 //
 // Thresholds are design choices that still need clinician review. An unlogged
-// day is never evidence either way.
+// day is never evidence either way, and neither is bleeding behind an
+// unanswered "Did your period start?": until the user answers, it may be a
+// period.
 
-import type { Cycle } from './cycles';
-import { addDays, compareDates, dateRange, diffDays, type ISODate } from './date';
+import { isPeriodFlow, unconfirmedBleedingStarts, type Cycle } from './cycles';
+import { addDays, compareDates, dateRange, diffDays, maxDate, type ISODate } from './date';
 import { periodPainOutcome, periodPainWindow } from './painGuide';
-import type { Prediction } from './prediction';
+import { overlapsContext, type Prediction } from './prediction';
 import type { ContextKind, ContextPeriod, DailyLog, Flow } from './types';
 
 export type RedFlagCode =
@@ -35,7 +37,7 @@ export interface RedFlagInput {
   cycles: Cycle[];
   logs: Record<ISODate, DailyLog>;
   contexts: ContextPeriod[];
-  prediction: Pick<Prediction, 'eligibleLengths'>;
+  prediction: Pick<Prediction, 'suspectedMissedLogCycles'>;
   today: ISODate;
 }
 
@@ -47,6 +49,8 @@ const OUTSIDE_PERIOD_CRAMPS = 5;
 const MIN_OUTSIDE_PERIOD_DAYS = 3;
 /** Days before the next start that belong to that period's pain and bleeding, not to the cycle before it. */
 const DAYS_BEFORE_NEXT_PERIOD = 2;
+/** As in cycles.ts: spotting days that still extend a period run. */
+const MAX_TRAILING_SPOTTING_DAYS = 2;
 const SEVERE_HEADACHE = 8;
 const HEADACHE_LOOKBACK_DAYS = 30;
 const FLOODING_LOOKBACK_DAYS = 90;
@@ -62,6 +66,14 @@ const NO_PERIOD_DAYS = 90;
 const NO_PERIOD_EXPECTED: ContextKind[] = ['pregnancy', 'breastfeeding', 'postpartum', 'hormonal_contraception'];
 
 type Finding = Omit<RedFlag, 'level'>;
+
+/** The input plus the unanswered "Did your period start?" bleeding, worked out once. */
+interface Evaluation extends RedFlagInput {
+  /** Starts of period-like bleeding, up to today, that the user has neither confirmed nor answered "no" to. */
+  unansweredStarts: ISODate[];
+  /** Days that would be period days, or the 2 days before a period, if those starts were confirmed. */
+  possiblePeriodDays: Set<ISODate>;
+}
 
 // ------------------------------------------------------------- helpers
 
@@ -96,8 +108,58 @@ function startedCycles(input: RedFlagInput): Cycle[] {
     .sort((a, b) => compareDates(a.start, b.start));
 }
 
-function completedCycles(input: RedFlagInput): (Cycle & { end: ISODate })[] {
-  return startedCycles(input).filter((c): c is Cycle & { end: ISODate } => c.end !== null);
+function completedCycles(input: RedFlagInput): (Cycle & { end: ISODate; length: number })[] {
+  return startedCycles(input).filter(
+    (c): c is Cycle & { end: ISODate; length: number } => c.end !== null && c.length !== null,
+  );
+}
+
+/** Last day of the bleeding run starting on `start`, with the same rule as a period run in cycles.ts. */
+function bleedingRunEnd(logs: Record<ISODate, DailyLog>, start: ISODate): ISODate {
+  let end = start;
+  let d = addDays(start, 1);
+  while (isPeriodFlow(logs[d]?.flow)) {
+    end = d;
+    d = addDays(d, 1);
+  }
+  for (let i = 0; i < MAX_TRAILING_SPOTTING_DAYS && logs[d]?.flow === 'spotting'; i++) {
+    end = d;
+    d = addDays(d, 1);
+  }
+  return end;
+}
+
+function withUnansweredBleeding(input: RedFlagInput): Evaluation {
+  const unansweredStarts = unconfirmedBleedingStarts(input.logs, input.cycles).filter(
+    (d) => !input.logs[d]?.notPeriodStart && compareDates(d, input.today) <= 0,
+  );
+  const possiblePeriodDays = new Set(
+    unansweredStarts.flatMap((start) =>
+      dateRange(addDays(start, -DAYS_BEFORE_NEXT_PERIOD), bleedingRunEnd(input.logs, start)),
+    ),
+  );
+  return { ...input, unansweredStarts, possiblePeriodDays };
+}
+
+/**
+ * Logged days of a cycle that match, outside its period and outside the 2 days
+ * before the next period. In the open cycle the next period may start
+ * tomorrow, so the last 2 days wait: a flag never appears and then vanishes
+ * when the period is confirmed. Days that may belong to an unanswered period
+ * start are left out until the user answers.
+ */
+function daysBetweenPeriods(input: Evaluation, c: Cycle, match: (l: DailyLog) => boolean): ISODate[] {
+  const last = addDays(c.end ?? input.today, -DAYS_BEFORE_NEXT_PERIOD);
+  return matchingDays(input.logs, addDays(c.periodEnd, 1), last, match).filter((d) => !input.possiblePeriodDays.has(d));
+}
+
+/** The last `completedCount` completed cycles, and the open one, which may hold evidence before its next period. */
+function lastCompletedAndOpen(input: RedFlagInput, completedCount: number): { completed: Cycle[]; open?: Cycle } {
+  const cycles = startedCycles(input);
+  return {
+    completed: cycles.filter((c) => c.end !== null).slice(-completedCount),
+    open: cycles.find((c) => c.end === null),
+  };
 }
 
 /** Days in a period's pain window (2 days before day 1 through day 3) that match. */
@@ -106,33 +168,17 @@ function painWindowDays(periodStart: ISODate, logs: Record<ISODate, DailyLog>, m
   return matchingDays(logs, w.start, w.end, match);
 }
 
-/**
- * Highest cramp score in a period's pain window from any logged day. Severity
- * flags use this rather than the pattern outcome: one day at 9/10 is severe
- * pain even if it is the only day logged.
- */
+/** Highest cramp score logged on any day of a period's pain window. */
 function anyDayPeak(periodStart: ISODate, logs: Record<ISODate, DailyLog>): number | null {
   const cramps = painWindowDays(periodStart, logs, (l) => l.cramps !== undefined).map((d) => logs[d].cramps as number);
   return cramps.length === 0 ? null : Math.max(...cramps);
 }
 
-/**
- * The cycles behind `eligibleLengths` (oldest first), matched newest first by
- * length among completed cycles. Only used to date the evidence.
- */
-function cyclesWithLengths(completed: Cycle[], lengths: number[]): Cycle[] {
-  const out: Cycle[] = [];
-  let j = lengths.length - 1;
-  for (let i = completed.length - 1; i >= 0 && j >= 0; i--) {
-    if (completed[i].length === lengths[j]) {
-      out.unshift(completed[i]);
-      j--;
-    }
-  }
-  return out;
-}
-
 // --------------------------------------------------------------- pain
+//
+// severe_pain and repeated_high_pain look at every logged day: one day at 9/10
+// is severe pain even if it is the only day logged. worsening_pain compares
+// periods, so it uses the pattern outcome, which needs 2 logged days.
 
 /** Peak cramps >= 8, or "couldn't do usual things", around either of the last 2 periods. */
 function severePain(input: RedFlagInput): Finding | null {
@@ -201,17 +247,10 @@ function worseningPain(input: RedFlagInput): Finding | null {
  * Cramps >= 5 on at least 3 days of the current or the last completed cycle,
  * outside its period and outside the 2 days before the next period.
  */
-function painOutsidePeriod(input: RedFlagInput): Finding | null {
-  const cycles = startedCycles(input);
-  const candidates = [
-    ...cycles.filter((c) => c.end !== null).slice(-1),
-    ...cycles.filter((c) => c.end === null).slice(-1),
-  ];
-  for (const c of candidates) {
-    const last = c.end === null ? input.today : addDays(c.end, -DAYS_BEFORE_NEXT_PERIOD);
-    const days = matchingDays(input.logs, addDays(c.periodEnd, 1), last, (l) =>
-      atLeast(l.cramps, OUTSIDE_PERIOD_CRAMPS),
-    );
+function painOutsidePeriod(input: Evaluation): Finding | null {
+  const { completed, open } = lastCompletedAndOpen(input, 1);
+  for (const c of open ? [...completed, open] : completed) {
+    const days = daysBetweenPeriods(input, c, (l) => atLeast(l.cramps, OUTSIDE_PERIOD_CRAMPS));
     if (days.length >= MIN_OUTSIDE_PERIOD_DAYS) {
       return {
         code: 'pain_outside_period',
@@ -266,42 +305,47 @@ function longBleeding(input: RedFlagInput): Finding | null {
 
 /**
  * Bleeding (spotting or more) outside the period run and outside the 2 days
- * before the next start, in at least 2 of the last 3 completed cycles.
+ * before the next start, in at least 2 cycles: the last 3 completed ones and
+ * the open one so far.
  */
-function intermenstrualBleeding(input: RedFlagInput): Finding | null {
-  const recent = completedCycles(input).slice(-3);
-  const hits = recent
-    .map((c) =>
-      matchingDays(input.logs, addDays(c.periodEnd, 1), addDays(c.end, -DAYS_BEFORE_NEXT_PERIOD), (l) =>
-        isBleeding(l.flow),
-      ),
-    )
-    .filter((days) => days.length > 0);
+function intermenstrualBleeding(input: Evaluation): Finding | null {
+  const { completed, open } = lastCompletedAndOpen(input, 3);
+  const bleeding = (c: Cycle) => daysBetweenPeriods(input, c, (l) => isBleeding(l.flow));
+  const openDays = open ? bleeding(open) : [];
+  const hits = [...completed.map(bleeding), openDays].filter((days) => days.length > 0);
   if (hits.length < 2) return null;
+  const openHit = openDays.length > 0;
+  const counted = completed.length + (openHit ? 1 : 0);
   return {
     code: 'intermenstrual_bleeding',
     since: hits[0][0],
-    detail: `Bleeding between periods in ${hits.length} of your last ${recent.length} cycles.`,
+    detail: `Bleeding between periods in ${hits.length} of your last ${counted} cycles${openHit ? ', including the current one' : ''}.`,
   };
 }
 
 // ------------------------------------------------------------- cycles
 
 /**
- * Among the last 6 eligible cycle lengths (at least 3), half or more under 24
- * or over 38 days, or a spread of 10 days or more.
+ * Among the last 6 completed cycles that count (at least 3), half or more under
+ * 24 or over 38 days, or a spread of 10 days or more. Unlike the prediction,
+ * cycles under 15 or over 90 days count: they are the most irregular of all.
+ * Cycles that overlap a context, unconfirmed suspected missed logs, and cycles
+ * holding an unanswered "Did your period start?" do not count.
  */
-function irregularCycles(input: RedFlagInput): Finding | null {
-  const lengths = input.prediction.eligibleLengths.slice(-IRREGULAR_WINDOW);
-  if (lengths.length < MIN_IRREGULAR_LENGTHS) return null;
+function irregularCycles(input: Evaluation): Finding | null {
+  const missedLogs = new Set(input.prediction.suspectedMissedLogCycles);
+  const counted = completedCycles(input)
+    .filter((c) => !overlapsContext(c, input.contexts) && !missedLogs.has(c.index))
+    .filter((c) => !input.unansweredStarts.some((d) => compareDates(d, c.start) >= 0 && compareDates(d, c.end) <= 0))
+    .slice(-IRREGULAR_WINDOW);
+  if (counted.length < MIN_IRREGULAR_LENGTHS) return null;
+  const lengths = counted.map((c) => c.length);
   const outside = lengths.filter((l) => l < SHORT_CYCLE || l > LONG_CYCLE).length;
   const spread = Math.max(...lengths) - Math.min(...lengths);
   if (outside * 2 < lengths.length && spread < IRREGULAR_SPREAD) return null;
-
-  const completed = completedCycles(input);
   return {
     code: 'irregular_cycles',
-    since: cyclesWithLengths(completed, lengths)[0]?.start ?? completed[0]?.start ?? input.today,
+    since: counted[0].start,
     detail: `Your last ${lengths.length} cycles were ${lengths.join(', ')} days long.`,
   };
 }
@@ -315,21 +359,36 @@ function noPeriodExpected(contexts: ContextPeriod[], today: ISODate): boolean {
   );
 }
 
-function noPeriod90Days(input: RedFlagInput): Finding | null {
-  const last = startedCycles(input).at(-1);
-  if (!last) return null;
-  const days = diffDays(input.today, last.start);
-  if (days < NO_PERIOD_DAYS || noPeriodExpected(input.contexts, input.today)) return null;
+/**
+ * 90 days without a period, counted only outside the contexts where none is
+ * expected: from the latest of the last confirmed start, the day after such a
+ * context ended, and unanswered period-like bleeding (which may be a period).
+ */
+function noPeriod90Days(input: Evaluation): Finding | null {
+  const cycles = startedCycles(input);
+  const last = cycles[cycles.length - 1];
+  if (!last || noPeriodExpected(input.contexts, input.today)) return null;
+  const contextEnds = input.contexts.flatMap((ctx) =>
+    NO_PERIOD_EXPECTED.includes(ctx.kind) && ctx.end !== undefined && compareDates(ctx.end, input.today) < 0
+      ? [addDays(ctx.end, 1)]
+      : [],
+  );
+  const from = [last.start, ...contextEnds, ...input.unansweredStarts].reduce(maxDate);
+  const days = diffDays(input.today, from);
+  if (days < NO_PERIOD_DAYS) return null;
   return {
     code: 'no_period_90_days',
-    since: last.start,
-    detail: `${days} days since your last period started.`,
+    since: from,
+    detail:
+      from === last.start
+        ? `${days} days since your last period started.`
+        : `No period confirmed in the ${days} days since ${from}.`,
   };
 }
 
 // ---------------------------------------------------------- evaluation
 
-const CHECKS: ((input: RedFlagInput) => Finding | null)[] = [
+const CHECKS: ((input: Evaluation) => Finding | null)[] = [
   severePain,
   repeatedHighPain,
   worseningPain,
@@ -344,8 +403,9 @@ const CHECKS: ((input: RedFlagInput) => Finding | null)[] = [
 
 /** Every red flag the logs show today, in a fixed order. */
 export function evaluateRedFlags(input: RedFlagInput): RedFlag[] {
+  const evaluation = withUnansweredBleeding(input);
   return CHECKS.flatMap((check) => {
-    const finding = check(input);
+    const finding = check(evaluation);
     return finding ? [{ ...finding, level: 'see_doctor' as const }] : [];
   });
 }

@@ -15,6 +15,7 @@ export const FERTILITY_REASON_CODES = [
   'cycle_start_unknown',
   'context_not_applicable',
   'cycle_locked_context',
+  'method_not_supported_postpartum',
   'cycle_checkin_unanswered',
   'temperature_blocked_mixed_measurements',
   'temperature_blocked_low_resolution',

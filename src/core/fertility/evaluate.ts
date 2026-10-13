@@ -5,9 +5,17 @@
 // recorded data. Unknown, missing, inconsistent or non-finite data is fertile.
 
 import { addDays, compareDates, dateRange, diffDays, isISODate, type ISODate } from '../date';
-import { deriveCycles, isInPeriod, isPeriodFlow, type Cycle } from '../cycles';
+import { deriveCycles, isPeriodFlow, type Cycle } from '../cycles';
 import type { AppData, DailyLog, Flow, TempRoute, TempUnit, TemperatureReading } from '../types';
-import { cycleCheckIn, isInsideContext, isNotApplicableOn, overlapsContext, type CheckIn } from './context';
+import {
+  checkInReportsPostpartum,
+  cycleCheckIn,
+  isInsideContext,
+  isNotApplicableOn,
+  isPostpartumOn,
+  overlapsContext,
+  type CheckIn,
+} from './context';
 import type {
   CycleFertilitySummary,
   DayFertility,
@@ -30,7 +38,8 @@ import {
 import {
   classifyTemperatureDay,
   evaluateStrictRise,
-  isValidAbove,
+  isAboveRise,
+  isUsableAsLow,
   isValidLow,
   lenientFhm,
   offsetChangeSuspectDates,
@@ -91,6 +100,24 @@ function isBleeding(flow: Flow | undefined): boolean {
   return flow === 'spotting' || isPeriodFlow(flow);
 }
 
+/**
+ * Section 3 + A16: contiguous days with any bleeding just before the confirmed
+ * CD1. Period flow there (a start confirmed a day late) is a possible earlier
+ * CD1, so it shortens N at least as much as leading spotting does.
+ */
+function leadingBleedingDays(logs: Record<ISODate, DailyLog>, start: ISODate): number {
+  let n = 0;
+  for (let d = addDays(start, -1); isBleeding(logs[d]?.flow); d = addDays(d, -1)) n++;
+  return n;
+}
+
+/** Section 3 period run: CD1 plus the following contiguous days with any bleeding (spotting counts). */
+function periodRunLength(logs: Record<ISODate, DailyLog>, dates: readonly ISODate[]): number {
+  let n = dates.length > 0 ? 1 : 0;
+  while (n < dates.length && isBleeding(logs[dates[n]]?.flow)) n++;
+  return n;
+}
+
 // ------------------------------------------------------- per-day assessment
 
 function assessTemperatureDay(inputs: Inputs, date: ISODate): DayTemp {
@@ -120,7 +147,7 @@ function assessMucusDay(inputs: Inputs, date: ISODate): MucusAssessment {
 interface DoubleCheck {
   S: number;
   rise: ConfirmedRise;
-  mucus: Extract<MucusResult, { status: 'COMPLETE' }>;
+  mucus: Exclude<MucusResult, { status: 'NONE' }>;
 }
 
 interface DayOutcome {
@@ -148,6 +175,8 @@ interface CycleEvaluation {
   thermometerId: string | null;
   checkIn: CheckIn;
   affected: boolean;
+  /** Section 3: cycle days 1..periodRunDays are the period run (the inPeriod badge, A18). */
+  periodRunDays: number;
   locked: boolean;
   temperatureBlocked: FertilityReason | null;
   firstCycle: boolean;
@@ -203,12 +232,16 @@ function pairsWithMucusPeak(rise: ConfirmedRise, effectivePeakDay: number): bool
   return effectivePeakDay >= rise.fhm - PAIR_BEFORE_FHM && effectivePeakDay <= rise.fhm + PAIR_AFTER_FHM;
 }
 
-/** A3.3: when mucus completes after the temperature, every reading FHM..S stays VALID and above (one Exception 2 dip excused). */
+/**
+ * A3.3: when mucus completes after the temperature, every reading FHM..S stays
+ * VALID and above (one Exception 2 dip excused). A5 applies to each of them as
+ * a higher reading: more than 60 min from the median time of the 6 lows is SUSPECT.
+ */
 function riseSustainedUntil(ev: CycleEvaluation, rise: ConfirmedRise, mucusCompleteDay: number, S: number): boolean {
   if (mucusCompleteDay <= rise.completeDay || ev.unit === null) return true;
   for (let d = rise.fhm; d <= S; d++) {
     if (d === rise.dipDay) continue;
-    if (!isValidAbove(ev.temps[d - 1], rise.coverline, ev.unit)) return false;
+    if (!isAboveRise(ev.temps[d - 1], rise, ev.unit)) return false;
   }
   return true;
 }
@@ -246,28 +279,63 @@ interface Ending {
   reason: FertilityReason;
 }
 
+type FlowOn = (d: number) => Flow | undefined;
+
+/** A1(a): flow >= light on any day after S, confirmed as a period start or not. */
+function periodLikeBleedingEnding(flowOn: FlowOn, S: number, L: number): Ending | null {
+  for (let d = S; d <= L; d++) {
+    if (isPeriodFlow(flowOn(d))) return { day: Math.max(d, S + 1), reason: 'possible_new_cycle' };
+  }
+  return null;
+}
+
+/** A1(b): 2 consecutive spotting days on or after FHM + 10 end the phase from the first of them. */
+function lateSpottingEnding(flowOn: FlowOn, S: number, L: number, lateFrom: number): Ending | null {
+  for (let d = Math.max(S, lateFrom) + 1; d <= L; d++) {
+    if (flowOn(d - 1) === 'spotting' && flowOn(d) === 'spotting') return { day: Math.max(d - 1, S + 1), reason: 'possible_new_cycle' };
+  }
+  return null;
+}
+
 /**
- * A1 + A4: the post-ovulatory phase ends at the earliest of period-like
- * bleeding, 2 spotting days or 2 low readings from FHM + 10, a temperature
- * collapse before then, or the FHM + 19 cap. A pair ends it from its first day.
+ * A4 before FHM + 10, A1(c) from then on: 2 consecutive VALID readings on or
+ * below the coverline after S. "Consecutive" is read over the VALID readings,
+ * not calendar days (section 0: the reading with fewer infertile days wins), so
+ * days without a VALID low reading in between (missing, bracketed, SUSPECT) do
+ * not hide a drop. The phase ends from the first of the two.
  */
+function lowTemperatureEnding(ev: CycleEvaluation, rise: ConfirmedRise, S: number, lateFrom: number): Ending | null {
+  let previous: number | null = null;
+  for (let d = S + 1; d <= ev.L; d++) {
+    const day = ev.temps[d - 1];
+    if (!isUsableAsLow(day)) continue;
+    if (!isValidLow(day, rise.coverline)) {
+      previous = null;
+      continue;
+    }
+    if (previous !== null) return { day: previous, reason: previous < lateFrom ? 'temperature_collapse' : 'temperature_drop' };
+    previous = d;
+  }
+  return null;
+}
+
+/** A1(d): the hard cap on FHM + 19. */
+function lutealCapEnding(rise: ConfirmedRise, S: number, L: number): Ending | null {
+  const day = Math.max(rise.fhm + LUTEAL_CAP_FROM_FHM, S + 1);
+  return day <= L ? { day, reason: 'luteal_phase_too_long' } : null;
+}
+
+/** A1 + A4: every way the post-ovulatory phase ends; the earliest one applies. */
 function postOvulatoryEndings(ev: CycleEvaluation, check: DoubleCheck, inputs: Inputs): Ending[] {
   const { S, rise } = check;
-  const flowOn = (d: number) => inputs.logs[ev.dates[d - 1]]?.flow;
+  const flowOn: FlowOn = (d) => inputs.logs[ev.dates[d - 1]]?.flow;
   const lateFrom = rise.fhm + LATE_LUTEAL_FROM_FHM;
-  const out: Ending[] = [];
-  for (let d = S; d <= ev.L; d++) {
-    const from = Math.max(d - 1, S + 1);
-    if (isPeriodFlow(flowOn(d))) out.push({ day: Math.max(d, S + 1), reason: 'possible_new_cycle' }); // A1(a)
-    if (d - 1 > S - 1 && d - 1 >= lateFrom && flowOn(d - 1) === 'spotting' && flowOn(d) === 'spotting') {
-      out.push({ day: from, reason: 'possible_new_cycle' }); // A1(b)
-    }
-    if (d - 1 > S && isValidLow(ev.temps[d - 2], rise.coverline) && isValidLow(ev.temps[d - 1], rise.coverline)) {
-      out.push({ day: d - 1, reason: d - 1 < lateFrom ? 'temperature_collapse' : 'temperature_drop' }); // A4, A1(c)
-    }
-    if (d >= rise.fhm + LUTEAL_CAP_FROM_FHM && d > S) out.push({ day: d, reason: 'luteal_phase_too_long' }); // A1(d)
-  }
-  return out.filter((e) => e.day <= ev.L);
+  return [
+    periodLikeBleedingEnding(flowOn, S, ev.L),
+    lateSpottingEnding(flowOn, S, ev.L, lateFrom),
+    lowTemperatureEnding(ev, rise, S, lateFrom),
+    lutealCapEnding(rise, S, ev.L),
+  ].filter((e): e is Ending => e !== null && e.day <= ev.L);
 }
 
 function orderedReasons(reasons: Iterable<FertilityReason>): FertilityReason[] {
@@ -281,7 +349,7 @@ function reconfirmsAfterReopen(ev: CycleEvaluation, check: DoubleCheck, rp: numb
   for (let d = rp; d <= rp + POST_PEAK_DAYS; d++) {
     const readings = readingsOf(inputs.logs[ev.dates[d - 1]]);
     const sameDevice = readings.every((r) => r.route === ev.route && r.thermometerId === ev.thermometerId);
-    if (!sameDevice || !isValidAbove(ev.temps[d - 1], check.rise.coverline, ev.unit)) return false;
+    if (!sameDevice || !isAboveRise(ev.temps[d - 1], check.rise, ev.unit)) return false;
   }
   return true;
 }
@@ -372,8 +440,12 @@ function passesPreOvulatoryGate(ev: CycleEvaluation, previous: CycleEvaluation |
   return longestUnchartedRun(previous, 1, previous.L) <= MAX_UNCHARTED_RUN;
 }
 
-/** Section 9 length N (minus-8, 5-day rule, lengthening) + A16 leading spotting. */
-function preOvulatoryLength(ev: CycleEvaluation, history: CycleEvaluation[]): { n: number; zeroReason: FertilityReason | null } {
+/** Section 9 length N (minus-8, 5-day rule, lengthening) + A16 leading spotting (and any other leading bleeding). */
+function preOvulatoryLength(
+  ev: CycleEvaluation,
+  history: CycleEvaluation[],
+  inputs: Inputs,
+): { n: number; zeroReason: FertilityReason | null } {
   if (ev.locked) return { n: 0, zeroReason: null };
   if (ev.firstCycle) return { n: 0, zeroReason: 'first_cycle' };
   if (!passesPreOvulatoryGate(ev, history[history.length - 1])) return { n: 0, zeroReason: 'previous_cycle_not_qualifying' };
@@ -385,7 +457,7 @@ function preOvulatoryLength(ev: CycleEvaluation, history: CycleEvaluation[]): { 
   if (candidate < DEFAULT_PRE_OVULATORY_DAYS) n = Math.max(candidate, 0);
   else if (qualifying >= CYCLES_TO_LENGTHEN) n = candidate;
   else n = DEFAULT_PRE_OVULATORY_DAYS;
-  n = Math.max(0, n - ev.cycle.leadingSpottingDays);
+  n = Math.max(0, n - Math.max(ev.cycle.leadingSpottingDays, leadingBleedingDays(inputs.logs, ev.cycle.start)));
   if (!Number.isInteger(n)) n = 0;
   return { n, zeroReason: n === 0 ? 'pre_ovulatory_rule' : null };
 }
@@ -447,6 +519,7 @@ function evaluateCycle(cycle: Cycle, history: CycleEvaluation[], inputs: Inputs)
     thermometerId: null,
     checkIn,
     affected,
+    periodRunDays: periodRunLength(inputs.logs, dates),
     locked: affected || checkIn === 'unanswered',
     temperatureBlocked: null,
     firstCycle: isFirstCycle(cycle, history[history.length - 1]),
@@ -477,7 +550,7 @@ function evaluateCycle(cycle: Cycle, history: CycleEvaluation[], inputs: Inputs)
   }
   if (ev.doubleCheck) ev.post = postOvulatoryPhase(ev, ev.doubleCheck, inputs);
 
-  const { n, zeroReason } = preOvulatoryLength(ev, history);
+  const { n, zeroReason } = preOvulatoryLength(ev, history, inputs);
   ev.preOvulatoryLength = n;
   ev.preOvulatoryZeroReason = zeroReason;
   ev.preOvulatory = preOvulatoryDays(ev, inputs);
@@ -508,7 +581,12 @@ function cycleDayOutcome(ev: CycleEvaluation, d: number, inputs: Inputs): DayOut
   }
   if (ev.locked) {
     const reasons: FertilityReason[] = [];
-    if (ev.affected) reasons.push('cycle_locked_context');
+    // Section 10: postpartum and breastfeeding locks have their own reason code.
+    const postpartum =
+      isPostpartumOn(inputs.data.contexts, ev.dates[d - 1]) ||
+      checkInReportsPostpartum(inputs.data.cycleContextAnswers, ev.cycle.start);
+    if (postpartum) reasons.push('method_not_supported_postpartum');
+    else if (ev.affected) reasons.push('cycle_locked_context');
     if (ev.checkIn === 'unanswered') reasons.push('cycle_checkin_unanswered');
     return { status: 'fertile', reasons };
   }
@@ -617,7 +695,7 @@ export function evaluateFertility(data: AppData, today: ISODate, deviceUtcOffset
         date: ev.dates[d - 1],
         cycleDay: d,
         status: outcome.status,
-        inPeriod: isInPeriod(ev.cycle, ev.dates[d - 1]),
+        inPeriod: d <= ev.periodRunDays,
         reasons: outcome.reasons.length > 0 ? outcome.reasons : ['default_fertile'],
       };
       if (outcome.eveningTransition) day.eveningTransition = true;

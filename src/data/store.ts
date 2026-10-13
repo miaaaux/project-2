@@ -20,15 +20,22 @@ export const TABLES = [
   'settings',
   'reminders',
   'shown_statuses',
+  'alert_acks',
 ] as const;
 
 export type Table = (typeof TABLES)[number];
 
+const docTable = (t: Table) =>
+  `CREATE TABLE IF NOT EXISTS ${t} (id TEXT PRIMARY KEY NOT NULL, data TEXT NOT NULL, updated_at TEXT NOT NULL);`;
+
 /** Each entry upgrades the schema by one version (PRAGMA user_version). Never edit a released entry. */
 const MIGRATIONS: string[] = [
-  TABLES.map(
-    (t) => `CREATE TABLE IF NOT EXISTS ${t} (id TEXT PRIMARY KEY NOT NULL, data TEXT NOT NULL, updated_at TEXT NOT NULL);`,
-  ).join('\n'),
+  // v1
+  (['daily_logs', 'exercise_sessions', 'context_periods', 'cycle_context_answers', 'settings', 'reminders', 'shown_statuses'] as const)
+    .map(docTable)
+    .join('\n'),
+  // v2: acknowledgements of the "shown as not fertile, now fertile" alert
+  docTable('alert_acks'),
 ];
 
 export const SCHEMA_VERSION = MIGRATIONS.length;
