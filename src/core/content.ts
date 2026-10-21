@@ -376,3 +376,24 @@ export const CONTEXT_QUESTIONS: { key: ContextQuestionKey; text: string }[] = [
 /** For the store listing, onboarding and Settings. */
 export const DISCLAIMER =
   "This app is not a medical device. It is for self-tracking and information only, and it doesn't diagnose, treat or prevent any condition. It is not a certified contraceptive: its fertility rules have not been validated, so don't rely on it alone to avoid pregnancy. For medical advice, talk to a doctor, nurse or pharmacist.";
+
+// ----------------------------------------------------------- mucus guide
+
+/** The "what to expect" popup next to the mucus question. Typical patterns only; cycles vary a lot. */
+export const MUCUS_GUIDE = {
+  title: 'How mucus usually changes',
+  intro:
+    'Rising oestrogen before ovulation makes cervical mucus wetter, clearer and stretchier. After ovulation, progesterone makes it thick or dry again. Check through the day by feeling and looking, and log the most fertile type you noticed.',
+  stages: [
+    { label: 'During and after your period', text: 'Often dry, or nothing in particular. Bleeding can hide mucus.' },
+    { label: 'Sticky', text: 'Thick, tacky or crumbly, white or cloudy. Breaks when stretched.' },
+    { label: 'Creamy', text: 'Smooth like lotion, white or cream. Feels moist.' },
+    { label: 'Watery', text: 'Thin and wet, may be clear.' },
+    { label: 'Egg-white', text: 'Clear, stretchy and slippery, like raw egg white. The most fertile type. The last day of your most fertile type is called the peak day; ovulation usually happens around then.' },
+    { label: 'After ovulation', text: 'Within a day or two it turns sticky, creamy or dry again and usually stays that way until your next period.' },
+  ],
+  variation:
+    'Not everyone sees every type, and the number of days of each changes from cycle to cycle. If you never see egg-white mucus, your most fertile type is your peak. A slippery or wet feeling counts as watery or egg-white even if you see nothing.',
+  colors:
+    'White, cream or cloudy is common before and after the fertile days, and clear is typical at the peak. Brown or pink usually means a little old blood. Yellow-green or grey mucus with itching, a strong smell or soreness can mean an infection; it is worth getting checked.',
+};

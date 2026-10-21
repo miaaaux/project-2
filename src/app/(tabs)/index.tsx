@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 
 import {
@@ -11,18 +11,21 @@ import {
   REMINDER_TEXT,
   prepCardMessage,
 } from '../../core/content';
+import { temperatureChart } from '../../core/chart';
 import { cycleDay } from '../../core/cycles';
 import { compareDates } from '../../core/date';
 import { useAppData } from '../../state/AppDataProvider';
 import { Body, Button, Card, Pill, Screen, Title } from '../../ui/components';
 import { range, shortDate } from '../../ui/format';
 import { HabitList } from '../../ui/HabitList';
+import { TemperatureChart } from '../../ui/TemperatureChart';
 import { space } from '../../ui/theme';
 
 export default function Today() {
   const { data, derived, clock, saveLog, markFertilityShown, updateSettings } = useAppData();
   const today = clock.today;
   const fertility = derived?.fertilityVisible ? derived.todayFertility : null;
+  const [chartIndex, setChartIndex] = useState<number | null>(null);
 
   useEffect(() => {
     if (fertility) void markFertilityShown(fertility).catch(() => undefined);
@@ -43,6 +46,26 @@ export default function Today() {
         <Title>{shortDate(today)}</Title>
         {currentCycle ? <Body muted>Cycle day {cycleDay(currentCycle, today)}</Body> : <Body muted>Log your period to start tracking.</Body>}
       </View>
+
+      {derived.cycles.length > 0 ? (() => {
+        const index = Math.min(chartIndex ?? derived.cycles.length - 1, derived.cycles.length - 1);
+        const shown = derived.cycles[index];
+        return (
+          <Card>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.sm }}>
+              <Button kind="secondary" label="‹" disabled={index === 0} onPress={() => setChartIndex(index - 1)} />
+              <View style={{ flex: 1, alignItems: 'center' }}>
+                <Body>{shown.end ? `Cycle ${index + 1}` : 'This cycle'}</Body>
+                <Body muted small>{range(shown.start, shown.end ?? today)}</Body>
+              </View>
+              <Button kind="secondary" label="›" disabled={index === derived.cycles.length - 1} onPress={() => setChartIndex(index + 1)} />
+            </View>
+            <TemperatureChart chart={temperatureChart(data, derived, index)} />
+          </Card>
+        );
+      })() : null}
+
+      <Button label="Log" onPress={() => router.push({ pathname: '/log/[date]', params: { date: today } })} />
 
       {bleedPrompts.map((d) => (
         <Card key={d} tone="period">
@@ -141,7 +164,6 @@ export default function Today() {
         </Card>
       ))}
 
-      <Button label="Log today" onPress={() => router.push({ pathname: '/log/[date]', params: { date: today } })} />
       <Button kind="secondary" label="Log exercise" onPress={() => router.push('/exercise-log')} />
       <Body muted small>{PAIN_FOOTER}</Body>
     </Screen>

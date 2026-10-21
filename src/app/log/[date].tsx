@@ -10,16 +10,16 @@ import type {
   ExclusionReason,
   Flow,
   Intercourse,
-  MucusAppearance,
-  MucusColor,
   MucusObservation,
-  MucusSensation,
   NotAssessableReason,
   PainImpact,
   Scale5,
   SugarServings,
 } from '../../core/types';
+import { MUCUS_CHOICES, mucusChoiceOf, mucusFieldsFor } from '../../core/mucusChoice';
 import { useAppData } from '../../state/AppDataProvider';
+import { ColorSwatches } from '../../ui/ColorSwatches';
+import { MucusGuideButton } from '../../ui/MucusGuide';
 import { Body, Button, Card, ChipGroup, Field, Scale10, Screen, Section, Stepper, ToggleRow } from '../../ui/components';
 import { shortDate } from '../../ui/format';
 import { space } from '../../ui/theme';
@@ -32,30 +32,6 @@ const FLOW: { value: Flow; label: string }[] = [
   { value: 'light', label: 'Light' },
   { value: 'medium', label: 'Medium' },
   { value: 'heavy', label: 'Heavy' },
-];
-const SENSATION: { value: MucusSensation; label: string }[] = [
-  { value: 'dry', label: 'Dry' },
-  { value: 'nothing', label: 'Nothing felt' },
-  { value: 'moist', label: 'Moist' },
-  { value: 'wet', label: 'Wet' },
-  { value: 'slippery', label: 'Slippery' },
-];
-const APPEARANCE: { value: MucusAppearance; label: string }[] = [
-  { value: 'nothing', label: 'Nothing seen' },
-  { value: 'sticky', label: 'Sticky' },
-  { value: 'creamy', label: 'Creamy' },
-  { value: 'watery', label: 'Watery' },
-  { value: 'egg_white', label: 'Egg-white' },
-];
-const COLOR: { value: MucusColor; label: string }[] = [
-  { value: 'none', label: 'None' },
-  { value: 'white', label: 'White' },
-  { value: 'cream', label: 'Cream' },
-  { value: 'yellowish', label: 'Yellowish' },
-  { value: 'cloudy', label: 'Cloudy' },
-  { value: 'clear', label: 'Clear' },
-  { value: 'blood_tinged', label: 'Blood-tinged / brown' },
-  { value: 'green_grey', label: 'Green / grey' },
 ];
 const NOT_ASSESSABLE: { value: NotAssessableReason; label: string }[] = [
   { value: 'bleeding', label: 'Bleeding' },
@@ -215,14 +191,18 @@ export default function LogScreen() {
         <ToggleRow label="Alcohol last evening" value={draft.alcoholPreviousEvening} onChange={(v) => set('alcoholPreviousEvening', v)} />
       </Section>
 
-      <Section title="Cervical mucus" hint="Notice how it feels and looks through the day; record the most fertile observation.">
-        <Body>Feeling</Body>
-        <ChipGroup label="Sensation" options={SENSATION} value={m?.sensation} onChange={(v) => setMucus({ sensation: v })} />
-        <Body>Appearance</Body>
-        <ChipGroup label="Appearance" options={APPEARANCE} value={m?.appearance} onChange={(v) => setMucus({ appearance: v })} />
-        <ToggleRow label="Stretchy" value={m?.stretchy} onChange={(v) => setMucus({ stretchy: v })} />
-        <Body>Color</Body>
-        <ChipGroup label="Color" options={COLOR} value={m?.color} onChange={(v) => setMucus({ color: v })} />
+      <Section title="Cervical mucus" hint="Notice it through the day and log the most fertile type you noticed.">
+        <MucusGuideButton />
+        <Body>Consistency</Body>
+        <ChipGroup
+          label="Consistency"
+          options={MUCUS_CHOICES.map((c) => ({ value: c.value, label: c.label }))}
+          value={mucusChoiceOf(m)}
+          onChange={(v) => setMucus(mucusFieldsFor(v))}
+        />
+        {mucusChoiceOf(m) ? <Body muted small>{MUCUS_CHOICES.find((c) => c.value === mucusChoiceOf(m))?.hint}</Body> : null}
+        <Body>Colour</Body>
+        <ColorSwatches value={m?.color} onChange={(v) => setMucus({ color: v })} />
         <ToggleRow label="I'm unsure" value={m?.unsure} onChange={(v) => setMucus({ unsure: v })} hint="Unsure days are counted as possibly fertile." />
         <Body muted small>Couldn’t assess it because of:</Body>
         <ChipGroup label="Not assessable" options={NOT_ASSESSABLE} value={m?.notAssessable} onChange={(v) => setMucus({ notAssessable: v })} />

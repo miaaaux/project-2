@@ -36,9 +36,8 @@ Dates are local calendar days (`YYYY-MM-DD`, see `src/core/date.ts`). They are n
 | | flooding | soaking a pad or tampon in 1–2 h, or clots larger than about 2.5 cm |
 | Temperature | BBT | 2 decimals in °C or °F, with measurement time, route (oral/vaginal/rectal) and thermometer. An optional "exclude this reading" needs a reason (fever, alcohol, short sleep, off-time, travel, medication, other). |
 | | disturbances | illness today; alcohol the previous evening |
-| Cervical mucus | sensation | dry / nothing felt / moist / wet / slippery |
-| | appearance (consistency) | nothing / sticky / creamy / watery / egg-white; stretchy yes/no |
-| | color | none / white / cream / yellowish / cloudy / clear / blood-tinged / green-grey |
+| Cervical mucus | consistency | one choice covering feel and look: dry / nothing / moist / sticky / creamy / watery / egg-white. Stored as the method's sensation + appearance pair (`src/core/mucusChoice.ts`), so the ratings t / Ø / f / S / S+ are unchanged. A "What to expect" popup explains the usual sequence. |
+| | colour | tappable round swatches: none / clear / white / cloudy / cream / yellowish / brown-pink / green-grey |
 | | unsure, not assessable | toggles. "Not assessable" needs a reason (bleeding, possible infection, vaginal medication, semen, lubricant). |
 | | final for today | confirmed in the evening (from 18:00 by default): this was the most fertile observation of the day |
 | Sex | sex drive | 1–5 (shown on the chart, never used by the rules) |
@@ -81,7 +80,11 @@ Types: `src/core/types.ts`.
 
 ---
 
-## 4. Temperature chart
+## 4. Home screen and temperature chart
+
+The home screen (Today) shows, from the top: the temperature chart of the current cycle (arrows step back to earlier cycles), a **Log** button that opens today's log, then the fertility status, period prediction, prompts, reminders, period prep and any red flags. There is no separate Chart or Log tab: tapping a past day in the Calendar opens that day's log for editing.
+
+Chart details:
 
 - **X axis:** cycle day (date in the tooltip). **Y axis:** the entry unit, auto-scaled to a span of at least 1.0 °C or 1.8 °F.
 - **Missing days** leave gaps: never interpolate. **Excluded and suspect readings** are hollow markers, with the reason on tap.

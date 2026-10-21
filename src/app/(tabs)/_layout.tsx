@@ -32,7 +32,6 @@ export default function TabsLayout() {
     >
       <Tabs.Screen name="index" options={{ title: 'Today', tabBarIcon: icon('today-outline') }} />
       <Tabs.Screen name="calendar" options={{ title: 'Calendar', tabBarIcon: icon('calendar-outline') }} />
-      <Tabs.Screen name="chart" options={{ title: 'Chart', tabBarIcon: icon('analytics-outline') }} />
       <Tabs.Screen name="insights" options={{ title: 'Pain guide', tabBarIcon: icon('leaf-outline') }} />
       <Tabs.Screen name="settings" options={{ title: 'Settings', tabBarIcon: icon('settings-outline') }} />
     </Tabs>
